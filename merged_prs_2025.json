@@ -1,0 +1,1933 @@
+[
+  {
+    "title": "Add retrieval unit tests",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1402",
+    "merged_at": "2025-01-07T17:20:49Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Refactor eval query filter mapping",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1413",
+    "merged_at": "2025-01-07T20:14:22Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Simplify experiment eval",
+    "description": "This PR removes some redundant code for running experiments evals. It also removes Arize-related Makefile code causing issues since Arize is deprecated",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1418",
+    "merged_at": "2025-01-07T20:14:23Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Removing unused prompt code",
+    "description": "An alternative to this PR is to keep old prompts in the codebase. However I find that more confusing - instead we should rely on version control / previous PRs if we want to use any of the old prompts",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1437",
+    "merged_at": "2025-01-10T20:11:32Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Call retrieval eval in orchestration service",
+    "description": "This PR continues the effort to consolidate all eval tasks into the orchestration service by adding case-level retrieval metrics to the eval output - specifically, a field `retrieval_grading_result` with the following data:\r\n\r\n```\r\n{'actual_retrieved_chunk': \"#Title#22 Life Beyond Work \\n\\nNewfront's commitment doesn't end ...\", 'retrieved_index': 1, 'retrieved_char_position': 5548}\r\n```\r\n\r\nThis PR creates `NewRetrievalEvalService` to eventually replace `RetrievalEvalService`. I keep `RetrievalEvalService` to enable retrieval experiments with the old notebook method while the refactor is still in progress.\r\n\r\nA follow-up PR will add the generation of the recall / threshold metrics to the orchestration service at which point we can fully deprecate the old notebook method.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1407",
+    "merged_at": "2025-01-13T18:04:30Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Adding limit param to eval config",
+    "description": "I find myself adding something like `[:5]` to the code to filter the eval data when testing eval over a small sample of questions. This PR makes it easier to do that through `make run_eval`:\r\n\r\n![Screenshot 2025-01-14 at 2 13 17\u202fPM](https://github.com/user-attachments/assets/ce608ffa-56a2-4e0f-8159-a01e2722d1db)\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1443",
+    "merged_at": "2025-01-14T23:57:28Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Add retrieval recall metric to main eval service",
+    "description": "This PR follows up on https://github.com/newfront-insurance/python-backend/pull/1407. Specifically it adds the recall / threshold table as a tab to the Excel output of the eval orchestration service:\r\n\r\n![Screenshot 2025-01-14 at 10 46 09\u202fAM](https://github.com/user-attachments/assets/c8b56144-2703-4023-ae72-52d832874f96)\r\n\r\nAdditional metric tables will be stored in the instance variable `extra_data` and exported to separate Excel tabs\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1442",
+    "merged_at": "2025-01-15T00:50:31Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Handle long conversations",
+    "description": "See context here: https://newfront.slack.com/archives/C055Y7DFQ5Q/p1734736334351089\r\n\r\nI tested locally successfully and will test on stage as well before deploying to prod",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1412",
+    "merged_at": "2025-01-15T21:20:47Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "fix long convo bug",
+    "description": "When testing in staging, this error occurred when a message triggers the converation too long logic: `Failed to store entity due to (builtins.TypeError) Object of type HumanMessage is not JSON serializable`. This is because we store the wrong version of the chat history. This PR should fix the error",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1453",
+    "merged_at": "2025-01-16T17:42:57Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Outputting deployment eval results into grading template",
+    "description": "Previously, deployment evals required manual work to copy the results of a deployment eval run into a grading template. This PR automates this by outputting the grading template complete for the servicing team to review.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1467",
+    "merged_at": "2025-01-22T20:48:58Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Create FastAPI endpoint for deployment eval",
+    "description": "This PR supports the admin experience spec'ed out in [this doc](https://www.notion.so/newfront/Tech-Spec-Benji-Admin-Experience-MVP-14063cbd78f880adbe93c28af381159c#14063cbd78f880fc9b89d1540b6206d3)\r\n\r\nI tested that this works locally with `make fastapi`",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1463",
+    "merged_at": "2025-01-22T20:53:57Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "[Expr] trim context newlines",
+    "description": "https://www.notion.so/newfront/Benji-experiment-trimming-context-newlines-18363cbd78f8801eaf9bd7a13e808fe6",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1268",
+    "merged_at": "2025-01-25T04:46:15Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "update eval data reason added enum",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1486",
+    "merged_at": "2025-01-27T17:33:23Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Retrieval cleanup",
+    "description": "I removed an unnecessary filtering of the retrieved chunks and improved names",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1528",
+    "merged_at": "2025-02-05T19:58:19Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Updating retrieval eval recall curve character thresholds",
+    "description": "Currently the max character threshold for retrieval shown in the eval output is 20,000. We are considering implementing a character based threshold with a higher threshold. This PR expands the max threshold in the eval output to 40,000:\r\n\r\n![Screenshot 2025-02-03 at 1 12 46\u202fPM](https://github.com/user-attachments/assets/14b53be5-3580-4e75-ab78-eae7b810798f)",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1527",
+    "merged_at": "2025-02-05T21:44:11Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "adding context metrics to eval output",
+    "description": "To support analysis of retrieval experiments, this PR adds metrics around the size of the context constructed for answering a question in the eval output:\r\n![Screenshot 2025-02-03 at 11 41 01\u202fAM](https://github.com/user-attachments/assets/207862b0-57d5-4567-98ac-cf9d0e36b726)\r\n![Screenshot 2025-02-03 at 11 40 15\u202fAM](https://github.com/user-attachments/assets/98ad390e-25f6-4e67-8992-1bddea006bb4)\r\n\r\nCouple things to note:\r\n* This PR stores `RetrievalData` in `AnswerData` instead of extracting specific attributes from `RetrievalData`\r\n* I moved `QAUserData` to a separate resource file to avoid a circular import error\r\n* Added a placeholder value for `SLACK_DISTRIBUTION_URL` to get eval to work",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1522",
+    "merged_at": "2025-02-05T21:53:38Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "remove unneeded imports",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1546",
+    "merged_at": "2025-02-05T23:45:57Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Configuring distribution type in eval",
+    "description": "Citations wouldn't be generated for mobile app namespaces when running eval since `distribution_type` is set to `SLACK` by default. Specifically this error is triggered:\r\n\r\n```\r\n            error_msg = (\r\n                f\"DistributionType is SLACK but the citation type is {type(citation)}. \"\r\n                \"Slack only supports PDF citations. \"\r\n                \"The wrong namespace was used or mobile app data was accidentally ingested into the namespace.\"\r\n            )\r\n```\r\n\r\nThis PR captures a new feature added to the eval dataset which indicates whether a namespace is for Slack or mobile and passes that into `generate_answer` to avoid this error. The new feature looks like:\r\n![Screenshot 2025-02-05 at 2 18 01\u202fPM](https://github.com/user-attachments/assets/b6e1a090-154d-40e7-bd6f-759307361dad)\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1542",
+    "merged_at": "2025-02-05T23:45:57Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "adding type field to documents table",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1483",
+    "merged_at": "2025-02-06T00:47:12Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Automatically generating citation eval metrics",
+    "description": "This PR makes evaluating citations performance in experiments faster. The resulting table looks like:\r\n\r\n![Screenshot 2025-02-07 at 3 18 12\u202fAM](https://github.com/user-attachments/assets/1472cab2-af59-4c92-a8e4-d141b142f67f)\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1551",
+    "merged_at": "2025-02-10T17:57:07Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Dynamically constructing chunk index type for LLM schema",
+    "description": "Currently the Pydantic model which defines the schema for the multi-task LLM call hard codes the number of chunks that the LLM can cite. We are planning to move to a retrieval thresholding method which makes the number of chunks variable and therefore need the citation field type to be dynamic.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1539",
+    "merged_at": "2025-02-10T23:03:09Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "fix division by zero bug",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1567",
+    "merged_at": "2025-02-11T23:00:49Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Adding automated answer correctness eval metrics",
+    "description": "Extra eval table looks like:\r\n![Screenshot 2025-02-10 at 6 03 35\u202fPM](https://github.com/user-attachments/assets/beb7a9ed-70f5-43ac-88ab-9cdc51364e40)\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1566",
+    "merged_at": "2025-02-11T23:43:55Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "[Expr] dynamic retrieval threshold",
+    "description": "https://www.notion.so/newfront/Benji-experiment-character-based-retrieval-threshold-18f63cbd78f88003898efa7b88475ce8",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1560",
+    "merged_at": "2025-02-14T00:18:53Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Fixing mobile eval run",
+    "description": "Tested that this runs successfully through `make fastapi` for both mobile and Slack distribution channels",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1595",
+    "merged_at": "2025-02-25T01:57:16Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Deprecate wildcard Slack channels",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1548",
+    "merged_at": "2025-03-04T21:52:31Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "add question understanding metrics",
+    "description": "This will enable faster experimentation. Example of the eval output:\r\n<img width=\"810\" alt=\"Screenshot 2025-02-20 at 1 56 41\u202fPM\" src=\"https://github.com/user-attachments/assets/597249b0-94af-4bdd-8d4f-036dbfe266a4\" />\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1597",
+    "merged_at": "2025-03-31T23:55:34Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Light refactors",
+    "description": "* removing unused prompts/schemas - this keeps the codebase cleaner and old prompts can still be referenced through version history\r\n* better if/then logic implementation",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1714",
+    "merged_at": "2025-04-01T17:00:50Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "add perf eval metrics",
+    "description": "This PR adds metrics which will help analyze cost and latency in experiments.\r\n\r\nExample of the new tab added to the eval output:\r\n\r\n<img width=\"636\" alt=\"Screenshot 2025-03-31 at 7 55 00\u202fPM\" src=\"https://github.com/user-attachments/assets/39e79a52-06de-4c7d-b359-5fa4b65e3995\" />\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1708",
+    "merged_at": "2025-04-01T17:12:01Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Add all eval data option",
+    "description": "This new experiment eval option allows for running an eval using all of the labeled data for LLM tasks. Previously the available options would only select labeled data for 1 LLM task, requiring running multiple evals to evaluate all LLM tasks.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1713",
+    "merged_at": "2025-04-01T23:28:03Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Finishing migration to new RetrievalEvalService",
+    "description": "This PR follows-up on https://github.com/newfront-insurance/python-backend/pull/1442 by fully removing the old retrieval eval code which was used for the Python notebook analysis approach. All eval tasks are consolidated in the `make run_eval` flow now",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1722",
+    "merged_at": "2025-04-07T20:11:07Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Increasing embeddings timeout",
+    "description": "I somewhat frequently ran into a timeout error with the OpenAI embeddings API call when running evals with high concurrency. This PR increases the timeout to avoid this error",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1736",
+    "merged_at": "2025-04-08T16:22:43Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Dynamically point to correct Pinecone env in evals",
+    "description": "Problem: our eval dataset contains a mix of namespaces that exist on both our prod and staging Pinecone databases. When we run evals locally we can only point to one hard coded database. This prevents us from running an experiment eval on all of the data desired.\r\n\r\nThis PR adds config fields that specify the local and staging Pinecone credentials and dynamically points to them for experiment evals based on a new eval dataset field `vectorstore_config`. We decided to add new fields since we didn't want to break existing use cases of the current fields.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1718",
+    "merged_at": "2025-04-10T04:01:09Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Never sort LLM fields for Benji",
+    "description": "Currently, LLM fields are configured not to sort when streaming is enabled. This means that LLM fields will be sorted for Slack and local evaluation runs without streaming which is undesirable. This PR configures the sorting explicitly with an extra parameter set in Benji's LLM call.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1744",
+    "merged_at": "2025-04-15T00:16:09Z",
+    "labels": [
+      "benji",
+      "platform"
+    ]
+  },
+  {
+    "title": "Migrating LLM pipeline for Slack to new pipeline design",
+    "description": "This PR is the first in a series to migrate the Slack handle message code to use the new `PipelineManager`, and starts with moving the LLM components into a pipeline. It intends to refactor the existing Slack LLM behavior without substantial changes to it or to code that affects the mobile pipeline. The new pipeline is gated behind a feature flag.\r\n\r\nI tested that this works by successfully receiving responses from a Slackbot set up locally.\r\n\r\nFuture changes will:\r\n* Expand the pipeline to cover application logic before and after the LLM actions\r\n* Consolidate mobile and Slack actions into shared actions that can be re-used\r\n* Optimize the Slack pipeline execution order\r\n* Add additional unit tests",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1760",
+    "merged_at": "2025-04-19T00:09:50Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Use original question for updating chat history",
+    "description": "Currently we pass the condensed question into updating chat history. Instead we should pass the original question. Using the condensed question results in an inaccurate conversation history.\r\n\r\nExample chat history with change:\r\n\r\nQ: do I have pet insurance?\r\nA: ...\r\nQ: for hamsters? (original question)\r\nA: ...\r\n\r\nExample without change:\r\n\r\nQ: do I have pet insurance?\r\nA: ...\r\nQ: do I have pet insurance for hamsters? (condensed question)\r\nA: ...",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1783",
+    "merged_at": "2025-04-21T17:41:42Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Add app post-processing code to Slack pipeline",
+    "description": "This PR follows up on https://github.com/newfront-insurance/python-backend/pull/1760. It expands the Slack pipeline to capture the code in the `_postprocess_message` method of `SlackMessageHandlerService`.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1775",
+    "merged_at": "2025-04-23T13:36:20Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Add app pre-processing code to Slack pipeline",
+    "description": "This PR follows up on https://github.com/newfront-insurance/python-backend/pull/1760. It expands the Slack pipeline to capture the code in the `_preprocess_message` method of `SlackMessageHandlerService`.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1790",
+    "merged_at": "2025-04-23T16:59:46Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "remove Arize code",
+    "description": "We were trialing Arize for observability but decided not to move forward",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1794",
+    "merged_at": "2025-04-23T17:24:28Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Organizing retrieval unit tests",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1800",
+    "merged_at": "2025-04-25T16:39:32Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Implement reranker stage in retrieval",
+    "description": "This PR implements the Cohere re-ranker which we decided to ship from this experiment: https://www.notion.so/newfront/Benji-experiment-adding-reranking-stage-16d63cbd78f880788ea6fcf94443acd5\r\n\r\nSome things to note:\r\n* It adds the reranker to both retrieval and its eval\r\n* A new object `RetrievalConfig` is created to contain all configurable parameters (ex. context threshold and reranker model)\r\n* Reranker API call will timeout after 4 secs\r\n\r\nChanges are gated behind a feature flag. Unit tests will be added in a future PR.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1793",
+    "merged_at": "2025-04-30T20:02:50Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "fix missing arg in mobile pipeline",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1849",
+    "merged_at": "2025-05-02T16:56:55Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Refactor handle message",
+    "description": "This PR follows up on https://github.com/newfront-insurance/python-backend/pull/1760. It expands the Slack pipeline to capture code in the public `handle_message` method. Unit tests will be added next.",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1829",
+    "merged_at": "2025-05-05T16:52:23Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "add formatting code to SlackResponse",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1873",
+    "merged_at": "2025-05-07T00:59:08Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Mathew/update readme",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1882",
+    "merged_at": "2025-05-08T01:06:46Z",
+    "labels": [
+      "tr-contract-review"
+    ]
+  },
+  {
+    "title": "Fix Slack API client bug",
+    "description": "The context manager was removed from `SlackAPIClientFactory`'s `get_api_client` method but everywhere this method was called was not updated, breaking staging. This PR fixes the issue",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1879",
+    "merged_at": "2025-05-08T16:53:54Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Adding Slack pipeline unit tests",
+    "description": "Will probably add some more action specific unit tests later",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1876",
+    "merged_at": "2025-05-08T17:40:29Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Mathew/parallelize doc extraction",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1921",
+    "merged_at": "2025-05-19T01:45:37Z",
+    "labels": []
+  },
+  {
+    "title": "Mathew/add eval",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1929",
+    "merged_at": "2025-05-20T00:35:13Z",
+    "labels": []
+  },
+  {
+    "title": "adding caching for eval and parallelizing judge LLM",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1930",
+    "merged_at": "2025-05-20T01:49:14Z",
+    "labels": []
+  },
+  {
+    "title": "More eval updates",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1935",
+    "merged_at": "2025-05-20T21:21:04Z",
+    "labels": []
+  },
+  {
+    "title": "Setup TR contract review project",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1945",
+    "merged_at": "2025-05-22T02:10:34Z",
+    "labels": [
+      "platform"
+    ]
+  },
+  {
+    "title": "synthetic eval scaffolding",
+    "description": "",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1970",
+    "merged_at": "2025-05-31T23:06:11Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "adding TR data extraction AI pipeline, eval and scaffolding",
+    "description": "This PR adds the TR data extraction project underneath the document extraction service. Check out this doc for more details: https://www.notion.so/newfront/Total-Rewards-AI-Data-Extraction-1f963cbd78f880e69d3ac653b2e5d966\r\n\r\nThis project is included within an existing service to\r\n* avoid adding maintenance overhead by creating a new service\r\n* consolidate data extraction projects in one place where they can share code\r\n\r\nI would like to merge the existing code to make it easier for other devs on the TR team to collaborate on. This is not production ready yet so feedback is welcome on areas of improvement for future PRs!\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1927",
+    "merged_at": "2025-06-04T16:17:04Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Dynamically construct specs from JSON",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* adds `spec_generator.py` which transform the source spec spreadsheet into a json for further manipulation. \"Spec\" refers to the data points specified for extraction\r\n* parameterizes the LLM pipeline and eval to accept `coverage_type` and `document_type` parameters\r\n* creates `ModelSpecGenerator` which generates the spec objects used by the LLM pipeline based on the json spec and the `coverage_type` and `document_type` parameters which apply transformations to the json data\r\n* organizes ground truth data\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nI tested that local eval and FastAPI endpoint both ran successfully. Unit tests will follow this PR.\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1986",
+    "merged_at": "2025-06-10T19:31:40Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Address pr feedback on #1986",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\nFollow-up on https://github.com/newfront-insurance/python-backend/pull/1986\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1997",
+    "merged_at": "2025-06-11T15:36:17Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Adding reranking unit tests",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/1994",
+    "merged_at": "2025-06-11T15:49:45Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "add Benji specific make commands for quality checks",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis will make it easier to pass CircleCI tests for Benji PRs\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2000",
+    "merged_at": "2025-06-11T19:54:28Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "update makefile and add unit tests for spec generation",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2007",
+    "merged_at": "2025-06-12T17:10:45Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "fix import logger bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2016",
+    "merged_at": "2025-06-13T22:25:53Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "adding ground truth data and refreshing raw spec",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2023",
+    "merged_at": "2025-06-17T16:35:57Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] support 2 tier plans in spec generation",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently, the AI service only supports extracting a single value for each property. This PR adds support for extracting an in-network and an out-of-network value for two-tier plans like medical PPO. \r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nAdded unit tests and ran the eval script successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2029",
+    "merged_at": "2025-06-18T17:37:45Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] automatically load ground truth from spreadsheet",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently:\r\n* ground truth data is hardcoded in the repo\r\n* running evals requires hardcoding variables to point to the ground truth data of interest\r\n\r\nThis PR\r\n* loads ground truth data from a Google Sheet where stakeholders assist with ground truth curation. `make ground-truth` should be run to refresh the ground truth data\r\n* adds an interactive CLI for running evals which selects the ground truth to run the eval over\r\n* organizes all scripts for loading data in a `scripts` directory\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nAdded lots of validation code and tested that every make command runs successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2031",
+    "merged_at": "2025-06-23T15:16:03Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] update spec and ground truth data",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSee title. Some light refactoring and validation changes were made as well\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2048",
+    "merged_at": "2025-06-23T15:58:19Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] making eval cli easier to use",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Supports selecting config options with indexes to minimize typing\r\n* Added test account enum\r\n![Screenshot 2025-06-24 at 12 34 05\u202fPM](https://github.com/user-attachments/assets/aca20599-d318-444d-ba70-f458fc78785c)\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2054",
+    "merged_at": "2025-06-24T17:51:50Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] support dental 2 tier plans",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nsee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nTested that eval runs over a dental 2 tier plan\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n\r\nhttps://newfront.atlassian.net/browse/TR-4445\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2056",
+    "merged_at": "2025-06-24T19:31:58Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] refactor how properties are iterated over",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently the pydantic model `AttributesResponseModel` is used to iterate over properties. However this is very awkward. This PR iterates over the custom class `EnrichedAttributes` instead\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nmanually ran pipeline / eval successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2070",
+    "merged_at": "2025-06-25T21:14:06Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] fix eval caching issue",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPreviously, the OCR and data extraction result from the latest eval run would be cached. This caused a problem: if a plan/document type was run with the cache enabled that was different compared to the previous eval run, the pipeline would get data for a different plan/document type from the cache. This PR caches data with plan/document type metadata to solve this issue.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nLocal eval runs as expected for various cache settings\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2071",
+    "merged_at": "2025-06-26T14:48:04Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] reduce spammy LLM logs",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nsee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2073",
+    "merged_at": "2025-06-26T15:21:26Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] query source data from Snowflake",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPreviously changes to our data sources, the spec and ground truth, required downloading the Google Sheets into the repo. This PR queries the data from Snowflake instead which is faster and more robust.\r\n\r\nI also snuck in refactoring changes to replace uses of the `os` library with `pathlib` which is a better library for handling paths\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* `make spec` and `make ground-truth` run successfully\r\n* inspected the json outputs\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2084",
+    "merged_at": "2025-06-27T20:19:30Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] type extracted data",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPreviously all extracted values were extracted as free-form strings with prompting on the value's type. This PR types extracted values according to the value type specified for each property in the raw spec spreadsheet.\r\n\r\nCheck out inline comments for more details\r\n\r\nsample raw spec:\r\n![Screenshot 2025-06-27 at 7 01 45\u202fPM](https://github.com/user-attachments/assets/93765d2d-e43f-4c43-a4cf-41b1e82e73eb)\r\n\r\nsample eval result:\r\n![Screenshot 2025-06-27 at 7 01 58\u202fPM](https://github.com/user-attachments/assets/67e354b1-5068-4dd1-a0d2-f275f6ca6e62)\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* tested that eval runs the pipeline successfully\r\n* updated unit tests and added validation\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n\r\nhttps://newfront.atlassian.net/browse/TR-4419",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2085",
+    "merged_at": "2025-06-30T17:11:36Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] lowercase attribute names",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSee title. Lowercase follows convention\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2094",
+    "merged_at": "2025-06-30T17:37:23Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] add constant for not found values",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nsee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2095",
+    "merged_at": "2025-06-30T17:53:52Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] add eval option to return pipeline output only for inputs",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPreviously eval required a set of ground truth data in addition to input docs. This PR adds a config option to just call the pipeline and return the output. This is useful for quickly testing ad hoc\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2114",
+    "merged_at": "2025-07-03T02:05:41Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR data extraction] adding support for attributes extraction into Salesforce",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* creates `AttributeExtractionPipeline` and adds preliminary evaluation support for it\r\n* modularizes the document extraction code into `DocExtractionService`\r\n* creates `ExtractionModelRegistry` to handle data extraction objects\r\n\r\nUnit tests will be added / updated in a follow-up PR.\r\n\r\nApologies for the large PR!\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nRan all loading scripts and pipelines through eval successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2100",
+    "merged_at": "2025-07-03T20:52:04Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] update not found values",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nsee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2120",
+    "merged_at": "2025-07-07T17:14:55Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Revert \"[TR extraction] update not found values\"",
+    "description": "Reverts newfront-insurance/python-backend#2120",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2129",
+    "merged_at": "2025-07-07T17:38:14Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] misc eval improvements",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* don't cache pipeline results when running eval just for output\r\n* wrapping cache config parameters in `PipelineCacheConfig`\r\n* adding ground truth data for Caredx SBCs that will be useful for testing UAT improvements\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nEval runs successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2128",
+    "merged_at": "2025-07-07T17:38:41Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] update ground truth validation and formatting",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* moved ground truth processing code to `GroundTruthHandler`\r\n* loading and validating ground truth value units\r\n* formatting ground truth data\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2124",
+    "merged_at": "2025-07-07T17:47:32Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] update ocr logging",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Remove `debug` parameter so that OCR logs are always saved locally\r\n* Fix file name bug\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2122",
+    "merged_at": "2025-07-07T17:59:13Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] support values and values + text options for attribute extraction",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPreviously, the attributes extraction pipeline would always extract values and their ancillary text. However, we want the user to also have the option to only extract the values. This PR adds support for this\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2121",
+    "merged_at": "2025-07-07T19:27:24Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] fallback to pdfplumber if llm ocr response fails",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nUAT testing discovered a bug where the first page of SBC documents was completely omitted by the LLM OCR. This was because the OpenAI API incorrectly detected the content sent as having unsafe content.\r\n\r\nWe fall back to a traditional OCR implementation with the PDFPlumber library to mitigate this. Thank you @bsgilber for the original idea!\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nRan eval successfully. Metrics showed improved performance over baseline\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2135",
+    "merged_at": "2025-07-08T21:34:06Z",
+    "labels": [
+      "document-extraction",
+      "platform"
+    ]
+  },
+  {
+    "title": "[TR extraction] adding support for new unit type and refreshing ground truth",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nsee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2140",
+    "merged_at": "2025-07-08T22:29:27Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] OCR improvements",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* update LLM OCR prompt\r\n* add more validation\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2147",
+    "merged_at": "2025-07-09T13:27:47Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] Adding network structure field to attribute extraction pipeline",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* populate `network_structure` field for attribute extraction pipeline\r\n* eval refactor to support both pipelines\r\n* eval scaffolding for attribute extraction\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2154",
+    "merged_at": "2025-07-10T22:11:10Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] consolidate spec objects",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR removes the dynamic generation of the `EnrichedAttributes` object, greatly simplifying the LLM backend. This object was generated to inject extraction instructions into the prompt. However this is done now by storing the extraction instructions into the `json_schema_extra` key of the Pydantic `Field` object.\r\n\r\nMost of the changes in this PR are simply propagating this change across the codebase.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* pipeline runs successfully via eval\r\n* Eval metrics do not show regressions. Note that I first tested the refactor without injecting context into the user prompt, relying on the Pydantic model completely to provide instructions. However that led to significantly worse performance so the context will continue to be injected into the user prompt\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2164",
+    "merged_at": "2025-07-11T16:24:03Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] add units to all values for doc comparison pipeline",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSee title. Motivated by UAT feedback where the unit wasn't showing in the value for monthly or yearly frequency (ex. `1` instead of `1 year`)\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* added unit tests\r\n* ran eval successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2174",
+    "merged_at": "2025-07-11T22:29:06Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] handle ancillary text",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR primarily updates how the attribute extraction pipeline processes the ancillary text extracted for properties.\r\n\r\n* load ancillary text spec data\r\n* update how text values and ancillary text are handled in attributes extraction pipeline\r\n* create/update fixtures and unit tests\r\n* improve prompt context injection code\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2177",
+    "merged_at": "2025-07-14T17:27:35Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] harden handling of network structure",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently property name and network structure for a property are concatenated into one field like `Coinsurance (In Network)` and manipulated with string operations when network structure needs to be extracted which is brittle. This PR creates a dedicated field for network structure data outside of the property name across the AI backend.\r\n\r\nFuture todos:\r\n- Refactor the output of the document comparison pipeline to have a dedicated field for network structure.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n- Added unit tests\r\n- Eval successfully runs without regressions in performance metrics\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2180",
+    "merged_at": "2025-07-15T18:36:23Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] update readme",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2196",
+    "merged_at": "2025-07-15T18:42:13Z",
+    "labels": [
+      "document-extraction",
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "[TR extraction] type spec property data",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR hardens the AI pipeline by typing the data loaded from the spec.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n- updated unit tests\r\n- eval ran successfully with no regression\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2195",
+    "merged_at": "2025-07-15T18:42:37Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] simplify extracted properties validation logic",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR simplifies how properties are iterated over when processing pipeline and eval results. The validation previously done during this to check that all expected properties exist in the results is moved to unit tests.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n- added unit tests\r\n- ran eval successfully with no regression in metrics\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2193",
+    "merged_at": "2025-07-15T22:00:38Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] add unit tests",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2203",
+    "merged_at": "2025-07-16T01:29:16Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] remove invalid eval CLI options",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSee title\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2208",
+    "merged_at": "2025-07-16T02:37:32Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] expr: LLM decomposition",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently we use a single LLM call to extract all of the specified data from the document(s) processed in a pipeline. This experiment decomposes this LLM call into two by splitting up the data extraction schema in order to improve performance (immediately and in future experiments). Note that the document context is kept intact and fully passed to each LLM call.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n- added unit tests\r\n- no regressions in performance:\r\n\r\nrecall (i.e. % of properties that should be extracted that did get a extraction value): 100% -> 100%\r\ntrue positive accuracy (i.e. % of properties that were correctly extracted had a correct value): 84% -> 82%\r\n\r\nNote that TP accuracy is deflated due to the grading being too strict from spot checking the results. The difference is likely is due to non-deterministic nature of LLMs. It looks like performance has remained the same. However I feel strongly that we need to do this as a prerequisite for other experiments that will make the LLM extraction task more complex.\r\n\r\neval data: https://docs.google.com/spreadsheets/d/17-u82Z1vn_S0AZpiIVileHfr0KMVxl434bNYphH031Y/edit?gid=917002933#gid=917002933\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2210",
+    "merged_at": "2025-07-17T20:15:46Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] update spec column names",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nUpdating spec column names to be clearer and propagating that change across the codebase\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nUnit tests pass and eval runs successfully with no regressions\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2236",
+    "merged_at": "2025-07-21T18:18:17Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] update values only attributes extraction behavior",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPut text values for any extraction config into the ancillary_text field\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2238",
+    "merged_at": "2025-07-21T19:05:38Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Scaffolding for email diff analysis",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCheck out module docstring\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2249",
+    "merged_at": "2025-07-22T01:17:34Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Supervised eval prototype",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCheck out the readme\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2252",
+    "merged_at": "2025-07-22T01:19:56Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Classification eval prototype",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n* moved db queries and ground truth data loading to `eval_data_manager.py`\r\n* check out readme updates\r\n* example of `python run_classifier_eval.py` logs below:\r\n\r\n<img width=\"1167\" height=\"569\" alt=\"Screenshot 2025-07-22 at 11 53 27\u202fAM\" src=\"https://github.com/user-attachments/assets/a95ea34a-885d-4a4b-91ea-8a2c1a514edf\" />\r\n<img width=\"1146\" height=\"768\" alt=\"Screenshot 2025-07-22 at 11 53 43\u202fAM\" src=\"https://github.com/user-attachments/assets/2a1d8ea0-3f5c-42ee-8210-462a855dc1a4\" />\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2263",
+    "merged_at": "2025-07-22T17:44:39Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Online eval scaffolding",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nDemo logs:\r\n\r\n<img width=\"952\" height=\"1240\" alt=\"Screenshot 2025-07-22 at 3 37 03\u202fPM\" src=\"https://github.com/user-attachments/assets/21ec89f9-ade2-404c-beb2-766c65923723\" />\r\n\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2272",
+    "merged_at": "2025-07-22T19:58:06Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "New replay emails script",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCheck out the docs added to the eval readme.\r\n\r\nHow is this different from the existing `make replay-emails` script:\r\n* allows you to specify a single email that you want to replay and constructs the email db state to do so\r\n* restores your db to its original state after the script is finished\r\n* groundwork for more functionality in the future\r\n\r\nExample logs:\r\n<img width=\"1593\" height=\"1341\" alt=\"Screenshot 2025-07-24 at 6 12 02\u202fPM\" src=\"https://github.com/user-attachments/assets/a89e1f26-c8de-45f1-9dda-6f24649ba804\" />\r\n<img width=\"2226\" height=\"958\" alt=\"Screenshot 2025-07-24 at 6 13 16\u202fPM\" src=\"https://github.com/user-attachments/assets/4d128d38-08c1-4ce8-9c9d-e487c218ab7f\" />\r\n\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2293",
+    "merged_at": "2025-07-25T16:17:06Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Hooking up replay functionality to classifier eval",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* check out readme updates\r\n* created `state_manager.py` to handle rewinding and applying trigger emails\r\n* hooked up state_manager to the classifier eval prototype\r\n* reorganized some functions\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2305",
+    "merged_at": "2025-07-27T20:35:27Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Eval submissions + add config for replay script",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nmajor changes:\r\n* adding config flow to the replay script with mock datasets\r\n* finishing prototype of submissions eval harness\r\n\r\nminor changes:\r\n* simplifying grading notes into a single arbitrary string\r\n* always restore db even if there's an error\r\n* Fix bug in `get_attachment_ids.py`\r\n\r\nCheck out demo videos here: https://www.notion.so/newfront/Eval-demo-videos-23e63cbd78f8803b8e70d001395fc9a7\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2312",
+    "merged_at": "2025-07-29T15:45:57Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Eval feature branch",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nAll of my eval work will get merged into this branch after being reviewed. Then I will attempt to merge into main at some point.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2264",
+    "merged_at": "2025-07-30T14:18:50Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "[TR extraction] specify page num to extract",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2329",
+    "merged_at": "2025-07-30T18:35:30Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] specifying the direction of percentages",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPrompt was updated to specify that percentage values should be from the perspective of the employee which is a requirement\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n* Verified the instructions were being injected into the prompt:\r\n<img width=\"2502\" height=\"770\" alt=\"Screenshot 2025-07-29 at 8 38 20\u202fPM\" src=\"https://github.com/user-attachments/assets/abd72793-7664-4343-80a4-86ffc941eb50\" />\r\n* No performance regressions from eval script\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2328",
+    "merged_at": "2025-07-30T19:13:39Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "fix make local",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nGot this error:\r\n\r\n```\r\n => ERROR [api-placement-service local 18/18] RUN apt-get update &&     apt-get install --no-install-suggests --no-install-recommends --yes poppler-utils &&     apt clean &&     rm -rf /var/lib/apt/lists/*                  0.5s\r\n------\r\n > [api-placement-service local 18/18] RUN apt-get update &&     apt-get install --no-install-suggests --no-install-recommends --yes poppler-utils &&     apt clean &&     rm -rf /var/lib/apt/lists/*:\r\n0.239 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]\r\n0.303 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]\r\n0.311 Err:1 http://deb.debian.org/debian bookworm InRelease\r\n0.311   At least one invalid signature was encountered.\r\n0.331 Err:2 http://deb.debian.org/debian bookworm-updates InRelease\r\n0.331   At least one invalid signature was encountered.\r\n0.332 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]\r\n0.356 Err:3 http://deb.debian.org/debian-security bookworm-security InRelease\r\n0.356   At least one invalid signature was encountered.\r\n0.360 Reading package lists...\r\n0.365 W: GPG error: http://deb.debian.org/debian bookworm InRelease: At least one invalid signature was encountered.\r\n0.365 E: The repository 'http://deb.debian.org/debian bookworm InRelease' is not signed.\r\n0.365 W: GPG error: http://deb.debian.org/debian bookworm-updates InRelease: At least one invalid signature was encountered.\r\n0.365 E: The repository 'http://deb.debian.org/debian bookworm-updates InRelease' is not signed.\r\n0.365 W: GPG error: http://deb.debian.org/debian-security bookworm-security InRelease: At least one invalid signature was encountered.\r\n0.365 E: The repository 'http://deb.debian.org/debian-security bookworm-security InRelease' is not signed.\r\n------\r\nfailed to solve: process \"/bin/sh -c apt-get update &&     apt-get install --no-install-suggests --no-install-recommends --yes poppler-utils &&     apt clean &&     rm -rf /var/lib/apt/lists/*\" did not complete successfully: exit code: 100\r\nmake: *** [local] Error 17\r\n```\r\n\r\nClaude Code vibe coded this fix for me\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2337",
+    "merged_at": "2025-07-30T19:35:09Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Task management eval",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nAdds an eval harness for task management i.e. the todo list to support experimentation on improving this feature.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2321",
+    "merged_at": "2025-07-31T00:57:25Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "[TR extraction] consistency eval script",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2346",
+    "merged_at": "2025-08-04T18:33:38Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Use PipelineManager in eval",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently evaluation calls `QAService` which is currently used in Slack deployments. However `QAService` will be replaced with a Slack `PipelineManager` as we are migrating to `PipelineManager` for all Benji question answering flows.\r\n\r\nThis PR create an eval pipeline to support the new `PipelineManager` abstractions. Note that this PR only adds an eval Slack pipeline which maintains parity with the existing functionality which only supports Slack as well. In the future a mobile specific eval pipeline should be added.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\ntested that critical flows run successfully (such as admin navigator deployment eval)\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2356",
+    "merged_at": "2025-08-07T08:13:15Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Dynamically set prompt instructions for employee and dependents",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThe mobile app will have dependents in addition to employee users. However it is possible that we expose employee specific data to dependent users. In order to solve undesirable behavior where Benji's response assumes the user is an employee and not a dependent, we prompt the LLM answer generation to contextualize its answer based on the user type.\r\n\r\nExample dependent response:\r\n<img width=\"1713\" height=\"384\" alt=\"Screenshot 2025-08-07 at 3 30 14\u202fPM\" src=\"https://github.com/user-attachments/assets/ecdb84c0-6882-4372-b3ba-0943d8470475\" />\r\n\r\nExample of how the formatted prompt looks like for a dependent:\r\n<img width=\"1700\" height=\"1027\" alt=\"Screenshot 2025-08-07 at 3 07 57\u202fPM\" src=\"https://github.com/user-attachments/assets/9d4a07eb-829e-499e-9f29-e2b39abe4670\" />\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* `python dev_cli.py mobile-message` is successful\r\n* `make run-slack` and asking a Slack question is successful\r\n* spot checked a couple of cases to verify intended behavior. In the future we should build support for testing dependent users directly into the eval system for more scalable and robust testing\r\n\r\n\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2353",
+    "merged_at": "2025-08-08T02:05:09Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "clean up legacy eval code",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR mainly removes the `eval_output` and `json_results` directories and related code scattered elswhere in the repo. I think it's safe to fully deprecate the old eval app because it should probably live in the operator UI. Moving forward, we'll take a more bottoms-up instead of a top-down approach (for example, an eval db will likely not be relevant for some time in terms of offline eval)\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nran `make local` and `make test-placement-agent-sample` successfully. LMK if there are other tests I should do\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2386",
+    "merged_at": "2025-08-09T00:31:06Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix Slack PipelineManager bug for DMs",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2399",
+    "merged_at": "2025-08-12T00:19:06Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Task management scaffolding",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Consolidating all task management code under `agent/orchestration`. This lives outside of the `tools` directory since orchestration occurs at a higher-level to orchestrate the tools.\r\n* Added function to generate a master task list across multiple placements. This will be useful when operating at scale to context switch effectively.\r\n\r\nFuture note: I think task management is a good candidate to prioritize online eval for because\r\n1. An operator will constantly be using the task management functionality, whether it's referencing the tasks to-do or working in the task queue which reflects the task management output. Online eval is more challenging for functionality like quote comparison which occurs relatively rarely -- if I push a change to improve it, I may not have the opportunity to test it for a week.\r\n2. I think an operator UI design where we have toggles for different task management versions makes intuitive sense. For example let's say currently we have a task queue that is sorted by policy expiration date and then the urgency of the tasks  for that policy. I want to test a change that uses AI to prioritize every task across the placement desk. There could be a dropdown menu with the options `Prioritize Policy Expiration` and `Prioritize Task Urgency` that I can switch between. This not only allows for rough online A/B testing but also can support different operator preferences.\r\n\r\nExample of placement-level task list data:\r\n<img width=\"1031\" height=\"654\" alt=\"Screenshot 2025-08-10 at 8 59 51\u202fPM\" src=\"https://github.com/user-attachments/assets/eacbb923-5143-4453-b180-16ab8400e5eb\" />\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2396",
+    "merged_at": "2025-08-12T18:38:24Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "guarantee max chunk size in document ingestion",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nWe are occasionally seeing document ingestion errors when `ChunkingService` returns chunks with text that is too large for the metadata in a Pinecone vectorstore record. This PR splits these chunks into smaller chunks to prevent this error from occurring.\r\n\r\nIt also adds unit test coverage for `ChunkingService` \u2728 \r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nAdded unit tests. The whole flow still needs to be tested with S3 and Textract\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2414",
+    "merged_at": "2025-08-14T00:00:16Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "updating replay emails script",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nAdding the ability to replay emails for a specific placement\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2416",
+    "merged_at": "2025-08-14T20:36:04Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Fix print email bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2429",
+    "merged_at": "2025-08-14T22:28:29Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "demo'ing how to handle follow-up emails",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nIt seems like a purely \"receive inbound email -> generate immediate to-do\" paradigm is not sufficient to cover all use cases: specifically when we want to ensure that we receive a response from someone when we need it. For example, frequently a placement operator has to decide when to and actually follow-up on our requests to external stakeholders for data, quotes, etc. This is a big use case that should be covered by our events/actions/tasks framework.\r\n\r\nThis PR mocks a possible flow covering\r\n* email received ->\r\n* email response drafted + follow-up scheduled ->\r\n* follow-up executed\r\n\r\nfor further discussion\r\n\r\n<img width=\"1932\" height=\"1122\" alt=\"Screenshot 2025-08-14 at 3 09 08\u202fPM\" src=\"https://github.com/user-attachments/assets/5016f736-3dc1-4065-b43a-7755028cb43c\" />\r\n<img width=\"1961\" height=\"1003\" alt=\"Screenshot 2025-08-14 at 3 09 22\u202fPM\" src=\"https://github.com/user-attachments/assets/0f10ffbf-fb80-4a2d-a47d-40ec6885bb87\" />\r\n<img width=\"1966\" height=\"491\" alt=\"Screenshot 2025-08-14 at 3 09 46\u202fPM\" src=\"https://github.com/user-attachments/assets/34c3d6b6-0e7f-4c79-962f-fe1dc7d39ffc\" />\r\n\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2422",
+    "merged_at": "2025-08-16T01:30:36Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Fix tenant data bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2461",
+    "merged_at": "2025-08-19T00:28:55Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "[TR extraction] Fixing type bugs",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nAttempts to fix the following type of errors:\r\n* LLM extracting `Not covered` for a USD or percentage typed property \r\n* LLM extracting `Not specified` for a property that doesn't exist in the document (property should just be omitted)\r\n\r\n\"Attempts\" is used since these LLM bugs can't be reproduced deterministically\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nSuccessfully solved the 2 issues mentioned in these Slack threads\r\n* https://newfront.slack.com/archives/C08QT42NX5H/p1755281409708159\r\n* https://newfront.slack.com/archives/C097QLCA2JX/p1754953476830449?thread_ts=1754953315.874519&cid=C097QLCA2JX\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2436",
+    "merged_at": "2025-08-19T16:25:07Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Clean up old code",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2463",
+    "merged_at": "2025-08-19T16:32:52Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Standup scheduling tool + AI service/knowledge base scaffolding",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nWill demo how this works in a sync\r\n\r\n* created scaffolding for `AIService` to understand how the follow-up tool will work with the new platform. I'm not opinionated about how this looks, but would like to extend and complete it if it looks like the right approach\r\n* Created `FollowUpTool` which decides whether to schedule follow-ups to ensure that we aren't missing anything. Common use case here is someone tells us they will give us data soon and we want to make sure they do so in a timely manner.\r\n* Created `KnowledgeBaseManager` with initial data on placement timelines that is used in the `FollowUpTool` to schedule the follow-up time. I believe this can be expanded to encode all placement intuition like the workflow guidelines.\r\n* Minor improvements to the replay dev script\r\n\r\nTo-dos:\r\n* Support handling a follow-up task that was created in the past. This will require adding \"replay days\" functionality to the replay script to visualize how scheduled follow-up tasks are picked up and handled.\r\n* Ensure support for generating follow-ups on manually sent emails. Currently follow-ups are only triggered off of inbound emails\r\n* Move task management code to a dedicated tool. Not sure yet but I think this can be used as a general health check to check if we are missing any tasks by looking at the placement state, and/or as a method to prioritize tasks across a placement desk for an operator.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nRan replay script\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2449",
+    "merged_at": "2025-08-19T16:55:56Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "[TR extraction] remove embedded deductible",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis property is not essential and challenging to extract correctly\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2466",
+    "merged_at": "2025-08-19T18:25:18Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "fix replay script",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2477",
+    "merged_at": "2025-08-20T16:56:40Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "[TR extraction} fix vision frequency type",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nAI incorrectly extracted `0.5` and typed this as `int` to indicate how often frames are covered in years\r\n* https://newfront.slack.com/archives/C0930KNUXCP/p1756230771394489\r\n* https://app.datadoghq.com/logs?query=trace_id%3A68adf368000000001c6eb648edf45f19&agg_m=count&agg_m_source=base&agg_t=count&cols=host%2Cservice&event=AwAAAZjnf1hzosVb4QAAABhBWmpuZjc3ckFBQ3NMc1NYaXdwOWxRcEUAAAAkMDE5OGU3ODEtMDFjOS00Mzc4LTgxNmQtODJkMDI5ZGQ0OGZlAAGHzA&fromUser=true&messageDisplay=inline&refresh_mode=paused&storage=hot&stream_sort=desc&viz=stream&from_ts=1756229504686&to_ts=1756231540457&live=false\r\n\r\nThis PR fixes it by typing it as months\r\n\r\n<img width=\"944\" height=\"252\" alt=\"Screenshot 2025-08-26 at 4 25 16\u202fPM\" src=\"https://github.com/user-attachments/assets/4c5664bf-561d-4838-be43-a4a2f8cca579\" />\r\n\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2524",
+    "merged_at": "2025-08-27T05:46:41Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] switch to sonnet 4",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nMotivation for switching is to use a longer context model to avoid context length errors for very long EOC docs. Sonnet 4 has a 1M token context window while gpt-4o is 128k\r\n\r\nChanges:\r\n* switching from gpt-4o to Sonnet 4\r\n* update ground truth to match the spec for evaluating the results\r\n* making sure Pydantic field names are not too long for the Anthropic API\r\n\r\nNotes:\r\n* This probably will fix a lot of AI typing mistakes because we are using a better model now\r\n* We should also consider trying Opus 4.1 which is generally a better model than Sonnet 4\r\n* Weirdly I wasn't able to reproduce the production context length error with gpt-4o locally (it succeeded)\r\n* Also weirdly the Sonnet 4 run for a very long EOC doc hung which I think is a transient issue. It worked over shorter docs. We should test in staging later\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nRan eval suite to check for regressions with good results:\r\n* recall: 98% -> 100%\r\n* true positive accuracy: 81% -> 87%\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2523",
+    "merged_at": "2025-08-27T05:48:11Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Update vectorstore config for custom evals",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2534",
+    "merged_at": "2025-08-27T18:50:32Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "script to find open enrollment related questions from prod",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis script is used to find questions for an eval set to test open enrollment intelligence support\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2351",
+    "merged_at": "2025-08-27T19:09:57Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "Add mobile eval pipeline",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Creates mobile eval pipeline to officially support testing mobile questions (previously only Slack was supported)\r\n* Also adds open enrollment option for experiment eval\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2536",
+    "merged_at": "2025-08-27T22:42:56Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "[TR extraction] value type enum fix",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nUltimately the value type objects are is a pretty bad state which is causing weird type issues that I don't fully understand at the moment. In this case a `Number per Year` enum member was not represented consistently across enums. A previous PR removed this value type from the spec so the immediate errors should be fixed by that. This PR clarifies by removing the enum member as well.\r\n\r\nAlso updated eval to support testing attributes extraction locally\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n\r\nhttps://newfront.atlassian.net/browse/TR-4995\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2525",
+    "merged_at": "2025-08-28T01:19:07Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] revert to openai model",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nAPI key error for Anthropic: https://app.datadoghq.com/logs?query=trace_id%3A68af864000000000358cee7fd31e5f3f&agg_m=count&agg_m_source=base&agg_t=count&cols=host%2Cservice&event=AwAAAZjtpKOdeRXCrAAAABhBWmp0cE81QkFBQTBabklnU3hQdlZ4TXIAAAAkZjE5OGVkYTUtOTEyYy00YWQyLWExYzEtY2VkZTQ1MmExNzNmAAD1eQ&fromUser=true&messageDisplay=inline&refresh_mode=paused&storage=hot&stream_sort=desc&viz=stream&from_ts=1756332632299&to_ts=1756334648836&live=false\r\n\r\nFrom research it looks like Sonnet 4 isn't actually supported in stage/prod since there are issues with calling it through AWS Bedrock\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2542",
+    "merged_at": "2025-08-28T02:04:12Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] consolidate type validation",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nMoves the logic to validate the extracted values and their types from just the document comparison pipeline to both the document comparison and attributes extraction pipeline.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2548",
+    "merged_at": "2025-08-28T23:58:36Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] remove ValueType enum",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThe `ValueType` enum creates unnecessary complexity. We can remove it and use `PropertyValueType` instead.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2547",
+    "merged_at": "2025-08-29T00:16:21Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "Fix replay script email removal",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nMotivation: Frances noticed that state wasn't completely rewinded during the replay script. This PR fixes 2 issues:\r\n* `status_summary` needs to be explicitly cleared before being generated\r\n* The db write method used did not remove any emails. The replay script now uses a method which does remove the necessary emails\r\n\r\nOther notes:\r\n* I reverted the unit of work implementation to help debug, since I originally thought that was the cause of the bug. Regardless it needs to be implemented more cleanly in a future PR and this PR prioritizes fixing the replay script for FDE use\r\n* Replay script only modifies the placement that the replayed email is associated with for simplicity and speed\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nTested replay script ran over the `PROCESS_NEW_EMAIL` AND `EMAIL_CLASSIFICATION` actions successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2563",
+    "merged_at": "2025-09-03T19:07:35Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Correct course tool",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Adds scaffolding for a course correct tool which generates tasks based on the placement state that should exist but don't. The tentative plan is for the platform to call this tool on a recurring cadence for every placement to make sure nothing is missed\r\n* Adds scaffolding for an additional implementation of the knowledge base manager to pull placement intuition into code\r\n* Adds a script to demo how the flow looks\r\n\r\nI considered calling this a \"health check\" tool but I thought it would be confusing since we have a systems \"health check\" already. We should rename this tool if we want to expand the scope from \"adding tasks that were missed\" to \"adding tasks based on placement state in general\"\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2464",
+    "merged_at": "2025-09-03T19:27:07Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "add option to persist actions to replay script",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR adds support for maintaining state across emails in the replay script. This will support use cases that don't interact with the placement state but instead consume it at different points in time. The replay script currently always resets the state for every email, which is necessary for use cases where persisting the replay state will illogically diverge from the historical state (Back to the Future type situation).\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nRan replay script successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2570",
+    "merged_at": "2025-09-04T17:02:05Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Follow up email drafts",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nStands up drafting follow-up emails and an eval harness for it. Note that the orchestration of these follow-ups still needs to be handled before this tool can be implemented in prod but this will enable experiments to refine the content.\r\n\r\nThis PR also reorganizes eval files \r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2571",
+    "merged_at": "2025-09-05T17:30:03Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix db write",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2585",
+    "merged_at": "2025-09-07T01:49:02Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Improve follow-up email drafts",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCheck out the experiment demo video in this doc: https://www.notion.so/newfront/Eval-demo-videos-23e63cbd78f8803b8e70d001395fc9a7#23e63cbd78f8803b8e70d001395fc9a7\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2587",
+    "merged_at": "2025-09-08T22:01:10Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Update system prompt",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Improves roleplaying instructions\r\n* Adds instructions to be concise\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nThe results from using Ryan's retry app over two cases look great. I think the updates make a lot of sense conceptually too\r\n\r\nCase 1:\r\n<img width=\"825\" height=\"554\" alt=\"Screenshot 2025-09-07 at 3 23 25\u202fPM\" src=\"https://github.com/user-attachments/assets/172c1bdb-0703-462a-8177-ff7862070a8b\" />\r\n<img width=\"824\" height=\"530\" alt=\"Screenshot 2025-09-07 at 3 23 35\u202fPM\" src=\"https://github.com/user-attachments/assets/098659a2-ede7-4d84-b3c5-9d33f666edaf\" />\r\n\r\nCase 2:\r\n<img width=\"807\" height=\"404\" alt=\"Screenshot 2025-09-07 at 3 38 47\u202fPM\" src=\"https://github.com/user-attachments/assets/6f500441-31e9-4afc-98dc-648021ee971e\" />\r\n\r\n\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2588",
+    "merged_at": "2025-09-08T22:34:52Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "set env email address to prod for replay script",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSo we don't have to make changes to `env.localhost` for testing and revert that before we merge\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2602",
+    "merged_at": "2025-09-09T21:28:22Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Implement prompt formatting pattern",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis prompt refactors some prompts missed in the initial prompt refactor to consolidate and standardize injection\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2605",
+    "merged_at": "2025-09-10T16:34:48Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "remove placement_id as a replay input",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nIt's not necessary to explicitly specify placement_id if email_id is specified since placement_id can always be derived from email_id\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2613",
+    "merged_at": "2025-09-10T18:26:44Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "organizing placement state tools",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR starts to organize our tools into more granular categories than just `primary` and `utilities` that I think will be easier to understand and maintain. It first adds all placement state related tools into `tools/placement_state`. If this looks good I'll complete the refactor\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* `make test` runs successfully\r\n* `make test-placement-agent-sample` runs successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2617",
+    "merged_at": "2025-09-11T01:31:20Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Replay unit tests",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nNeed more confidence that the replay script won't break when making changes to it. The most important tests I think are integration tests that actually test the db operations but those are much more complicated so I plan to do them later\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2615",
+    "merged_at": "2025-09-11T17:22:44Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "update placement state prompts",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Use central prompt file + standardized formatting for more prompts\r\n* Organize placement state prompts in one place, so each prompt file maps to a tool directory\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2622",
+    "merged_at": "2025-09-11T19:14:15Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Fix attachment bug / improve logging",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nEmail attachment was erroring since it had a `content_type` value of `None`:\r\n\r\n```\r\n  File \"/Users/mathew.wang/Documents/code/python-backend/services/placement-service/agent/process_new_email.py\", line 213, in handle_email_attachments\r\n    await extract_text_from_all_attachments_from_email_and_generate_summaries(email)\r\n  File \"/Users/mathew.wang/Documents/code/python-backend/services/placement-service/agent/tools/utilities/extract_text_from_email_attachments.py\", line 539, in extract_text_from_all_attachments_from_email_and_generate_summaries\r\n    updated_attachments, download_cache = await extract_text_and_generate_summaries_for_attachments(\r\n                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/mathew.wang/Documents/code/python-backend/services/placement-service/agent/tools/utilities/extract_text_from_email_attachments.py\", line 480, in extract_text_and_generate_summaries_for_attachments\r\n    text_content, reg_summary_tasks, reg_document_type_tasks = await _process_regular_attachment(\r\n                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/mathew.wang/Documents/code/python-backend/services/placement-service/agent/tools/utilities/extract_text_from_email_attachments.py\", line 306, in _process_regular_attachment\r\n    processed_file = process_binary_file_as_text_and_image(\r\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/mathew.wang/Documents/code/python-backend/services/placement-service/agent/tools/utilities/extract_text_from_email_attachments.py\", line 181, in process_binary_file_as_text_and_image\r\n    file_content_type = file_content_type.lower()\r\n                        ^^^^^^^^^^^^^^^^^^^^^^^\r\nAttributeError: 'NoneType' object has no attribute 'lower'\r\n```\r\n\r\nThis PR should fix it along with improved logging\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2630",
+    "merged_at": "2025-09-12T20:30:01Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Context management scaffolding",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Consolidating context related functions into the `context_management` tool\r\n* Created preliminary eval harness for evaluating context construction for LLM calls that require context of emails across a placement. Goal of this is to measure impact to recall (i.e. including relevant info in the context) as we improve precision (i.e. removing irrelevant info from the context)\r\n\r\nExample test results for context eval harness:\r\n<img width=\"2544\" height=\"1012\" alt=\"Screenshot 2025-09-12 at 3 28 46\u202fPM\" src=\"https://github.com/user-attachments/assets/3f15f61b-5375-4715-a2e0-c303b8fd251b\" />\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n`make test-placement-agent` ran successfully except for 2 unrelated errors:\r\n\r\n```\r\n\u274c FAILED EMAILS (2):\r\n   \u2022 RE: __submission_gpt__ UJet - failed: {\"detail\":{\"error\":{\"code\":\"INTERNAL_SERVER_ERROR\",\"message\":\"Email processing failed: LLMProviderError: Error occurred while getting LLM response after retries.\",\"details\":{},\"correlation_id\":\"2f42deb3-9339-4435-98ee-b8f25758a11a\"}}}\r\n   \u2022 M.MOSER ASSOCIATES LLC - Policy NB#7931668 - failed: {\"detail\":{\"error\":{\"code\":\"INTERNAL_SERVER_ERROR\",\"message\":\"Email processing failed: AttributeError: 'dict' object has no attribute 'action_type'\",\"details\":{},\"correlation_id\":\"61becb45-da0f-4c51-937a-c1ab611c56ae\"}}}\r\n```\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2650",
+    "merged_at": "2025-09-15T16:17:31Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix file bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2667",
+    "merged_at": "2025-09-16T04:13:50Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix get_email_by_id bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2671",
+    "merged_at": "2025-09-16T16:50:46Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix reply all bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2685",
+    "merged_at": "2025-09-17T16:42:10Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "Filtering email context for the general follow-up tool",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* added function to filter email context based on relevancy to the LLM task prompt using a LLM\r\n* turning on the filter just for the general reply tool. Didn't do a lot of testing but we don't rely on email drafts today so I think it's fine to ship and tune later\r\n* added ground truth to email context eval harness\r\n* converted `all_emails_to_text_for_llm` to async so we can call the async LLMManager in it\r\n\r\nFollow-ups:\r\n* add unit tests\r\n* consider heavily compressing irrelevant emails instead of filtering them out entirely\r\n* filter out gpt emails\r\n* decompose filtering into multiple calls for large number of emails\r\n* fill out context to hit N% of all emails to avoid removing too many emails\r\n\r\nDemo: https://www.notion.so/newfront/Eval-demo-videos-23e63cbd78f8803b8e70d001395fc9a7#23e63cbd78f8803b8e70d001395fc9a7\r\n\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nFor limited test set of 4 cases: filtered out 86% of emails with 100% recall (check out demo video)\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2668",
+    "merged_at": "2025-09-19T00:29:52Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "refactor(eval): clean up",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* removing mock/deprecated eval scripts\r\n* standardizing ground truth objects\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2710",
+    "merged_at": "2025-09-19T18:28:13Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai): follow-up draft emails script",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Provides a more generic version of @jennnmui's ERU follow-ups PR https://github.com/newfront-insurance/python-backend/pull/2519\r\n* Running `follow_up_script.py` will determine which email threads need follow-ups and if so drafts the Outlook emails for a set of hard coded placements\r\n\r\nExample of a good follow-up decision + draft:\r\n<img width=\"1385\" height=\"792\" alt=\"Screenshot 2025-09-22 at 7 21 29\u202fPM\" src=\"https://github.com/user-attachments/assets/1ae83f76-a4e3-46c8-bc49-ebcf5548a7e4\" />\r\n\r\nFuture work:\r\n* Right now follow-ups are generated if the thread looks like it needs a follow-up, but timing logic should be incorporated as well (ex. only send a follow-up if we haven't received a response in 3 business days)\r\n* Course correct tool can also be triggered under the same framework to check for email threads where the placement team hasn't responded but should have\r\n* Eval harness to measure classification metrics of whether the LLM decided to follow-up correctly\r\n* Fix precision issues since the tool loves to generate a follow-up for almost every thread\r\n* Consolidate/cleanup more of my old follow-up code\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nRan `follow_up_script.py` successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2718",
+    "merged_at": "2025-09-23T19:13:58Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "[TR extraction] fix(ai): add validation retries",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nWe are seeing a lot of non-deterministic and varied type validation failures from the LLM not following the schema definition provided in the prompt. I decided to add a LLM retry to solve one of these issues locally and it worked. I'm not sure how effective this is overall but it could only help in preventing typing errors.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2743",
+    "merged_at": "2025-09-24T00:33:34Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extraction] experiment(ai): improve consistency through comparison LLM call",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThe problem is that we do the extraction for each document of a pair being compared separately and the LLM could use a different methodology for each doc, making it look like there are a lot of changes when there aren't.\r\n\r\nWe could solve this issue if we add a LLM call which takes both documents into context and checks which properties changed before extracting the structured values. This solves the problem: consistency % (as measured by the % of values that change across the same document being processed multiple times) increased from 75% to 100% without introducing regressions in accuracy.\r\n\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* Ran eval locally\r\n* Added unit tests\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2745",
+    "merged_at": "2025-09-25T17:11:00Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "fix(eval): fix eval bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2709",
+    "merged_at": "2025-09-25T17:12:56Z",
+    "labels": [
+      "benji",
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "[TR extract] chore(ai): update spec",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2769",
+    "merged_at": "2025-09-25T21:00:46Z",
+    "labels": [
+      "document-extraction"
+    ]
+  },
+  {
+    "title": "feat(ai): eval harness for follow-up decisions",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* create an eval harness that does binary classification eval on whether a follow-up is triggered\r\n* add ground truth for whether an email thread could use a follow-up based on a snapshot of the placement state\r\n* clean up old unused code\r\n* reorganize code in `tools/follow_up`\r\n\r\nExample logs from the eval script:\r\n<img width=\"869\" height=\"627\" alt=\"Screenshot 2025-09-24 at 6 30 56\u202fPM\" src=\"https://github.com/user-attachments/assets/97e70ba2-7912-4751-a748-803dd1ca1d84\" />\r\n\r\nMy next steps are\r\n* improving performance of the classifier, right now precision is really bad:\r\n<img width=\"555\" height=\"230\" alt=\"Screenshot 2025-09-24 at 6 31 05\u202fPM\" src=\"https://github.com/user-attachments/assets/3f3234f5-e139-49b2-be7d-96addf5b7fe8\" />\r\n\r\n* supporting a delay since we want to give a chance for the stakeholder to respond before we follow-up. I think testing this will use more of a unit test than eval approach since I'm planning on a purely programmatic approach (ex. check how far we are from policy expiration)\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2756",
+    "merged_at": "2025-09-25T21:50:18Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(ai/follow-ups): ignore gpt emails",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2760",
+    "merged_at": "2025-09-25T22:40:28Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/follow-ups): add timing logic",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Gating follow-ups on a combination of the following inputs: placement stage, days until expiration, and days since last contact\r\n* Cleaned up old code\r\n\r\nNext steps:\r\n* add unit tests (this is like eval but on the deterministic code)\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2772",
+    "merged_at": "2025-09-27T00:51:21Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "chore(eval): make replay restore/backup faster",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nI noticed the backup/restore functions taking a long time (>20 secs) which significantly slows down eval. I think this is because these operate on the entire db which has grown in size recently.\r\n\r\nThe only 2 tables relevant for eval today are `emails` and `placement_states` so this PR changes the backup/restore functions to only operate on those tables, making these functions run nearly instantly. This change also allows us to remove the code which awkwardly handles the llm logs table edge case.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2783",
+    "merged_at": "2025-09-29T17:19:02Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "merge freeze branch",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nMerged https://github.com/newfront-insurance/python-backend/pull/2783 originally into `place/freeze-merge` which should go into `main`\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n\r\n# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2790",
+    "merged_at": "2025-09-30T18:38:15Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/follow-ups): prepare follow-up script for \"prod\"",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThe changes in this PR allow us to run v1 of the follow-up script on a daily cadence for all active placements. Performance will likely still be a ways off from auto-sending but this will help with iterating on improvements. The scope for now is just submission preparation (i.e. from the beginning up until when we submit to carriers) since this early phase is less complicated and thus easier to achieve auto-send eventually.\r\n\r\n* added salutation/signature\r\n* randomized body format to sound less robotic\r\n* updated ground truth / eval improvements\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2780",
+    "merged_at": "2025-09-30T19:48:24Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(follow-ups): general improvements",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* update prompt\r\n* update follow-up config\r\n* use ERU specific config for ERU placements\r\n* add ground truth\r\n* eval error handling\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2796",
+    "merged_at": "2025-10-02T21:03:12Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/placement-state): improve placement steps status extraction",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR improves the `placement_steps_status` LLM extraction since the follow-up tool relies on this. It's the only tool that needs it so far. This should also make the pizza tracker on the operator UI a lot more accurate (as emails are processed and the status gets re-generated).\r\n\r\n* Simplified LLM extraction from finding the status of every stage to just a single placement stage value\r\n* Doesn't change the schema of the existing `placement_steps_status` db field to avoid breaking things downstream\r\n* Performance based on vibes looks really good, especially compared with the old approach which was not very good\r\n\r\nTodos:\r\n* We should eventually replace the `placement_steps_status` field with a simple `placement_stage` single value field and get rid of the code that converts the LLM output into the db field schema and vice versa\r\n* Consider adding an eval harness (vibes based eval seems sufficient for now)\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nFollow-up script ran successfully on a variety of random placements\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2804",
+    "merged_at": "2025-10-03T22:53:55Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(ai/placement-state): bad placement stage value",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSome preliminary carrier intake follow-up work is mixed in here but need to get the bug fix in so emails are processed properly\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2806",
+    "merged_at": "2025-10-04T00:59:41Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(ai/placement-state): None bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nShould fix this error: https://app.datadoghq.com/logs?query=service%3Aapi-placement-service%20env%3Aprod%20status%3Aerror%20-%22traces%20to%20intake%22%20-%22Token%20has%20expired%22%20-%22Token%20is%20invalid%22%20-%22Configured%20ddtrace%20instrumentation%22%20-%40http_status%3A401%20-%40http_status%3A403&agg_m=count&agg_m_source=base&agg_t=count&cols=host%2Cservice&event=AwAAAZm7VxiUjV4yqQAAABhBWm03Vjk4TkFBQjEzbk9ocGRORTBnWkIAAAAkZjE5OWJiNWItY2MxZi00N2NkLWJhNjctNTNkNjI3MTliYWQ5AAMg-Q&fromUser=true&link_source=monitor_notif&messageDisplay=inline&refresh_mode=sliding&storage=hot&stream_sort=desc&viz=stream&from_ts=1759784415000&to_ts=1759784715000&live=false\r\n\r\n```\r\n[get_updated_placement_steps_status] Tool get_updated_placement_steps_status failed after 0.00s: 'NoneType' object has no attribute 'to_placement_stage'\r\n```\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2813",
+    "merged_at": "2025-10-06T22:57:51Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(email): support draft only email creation + refactor",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nMy follow-up script was auto-sending bad follow-up emails to folks on the whitelist which created some confusion. This PR adds an option to always draft an email and never send even to the whitelist and does some refactoring.\r\n\r\n* Adds `draft_only` parameter to email send methods\r\n* Removes the print instead of send decorator which is handled elsewhere\r\n* Adds comprehensive unit tests to test the critical email send gating functionality\r\n\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2843",
+    "merged_at": "2025-10-16T16:40:49Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "refactor(email): implement email handling mode enum",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* consolidating `print_instead_of_send_email` and `draft_only` params into a single enum\r\n* deleted very stale `ai_service` scaffolding code\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2847",
+    "merged_at": "2025-10-17T17:22:45Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/emails): POC for adding commentary to email drafts",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR implements a tool that adds commentary to an AI drafted email to augment operator review. Currently this will be implemented via another draft email but in the long-term this will likely live in the operator UI if we find this useful.\r\n\r\n* Added option to email draft harness to execute as drafts in addition to proposing actions\r\n* Added option to email draft harness to test the submission prep tool only and call it directly\r\n* Rewind db fix\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2837",
+    "merged_at": "2025-10-21T17:22:19Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/follow-ups): misc follow-up support",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nMainly adding a script to backfill update placement status in case there are some placements with stale, bad data since placement status updates are triggered by incoming emails\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2807",
+    "merged_at": "2025-10-21T19:04:38Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(email): fix commentary draft bug",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThe draft commentary tool is skipped instead of crashing the whole process if it errors\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2872",
+    "merged_at": "2025-10-22T00:09:29Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(ai/tool): pass missing data to commentary tool",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCommentary tool needs the placement id from the `ProposedEmailAction` result from other AI tools in order to know which placement to generate commentary for\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2873",
+    "merged_at": "2025-10-22T01:28:31Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(ai/email): commentary draft bug 2",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2876",
+    "merged_at": "2025-10-22T17:32:11Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(eval): update custom template",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2884",
+    "merged_at": "2025-10-22T23:50:05Z",
+    "labels": [
+      "benji"
+    ]
+  },
+  {
+    "title": "fix(ai/commentary): handle new email drafts",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2899",
+    "merged_at": "2025-10-24T21:15:36Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/tools): improve follow-up decision-making",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Injecting placement summaries instead of all emails\r\n* Separating out the email to respond to from the prior emails in the email thread\r\n* Prompt wordsmithing\r\n* Added more ground truth\r\n* Fixing rewind bug\r\n\r\nNext step: This PR focuses on improving the AI's decision to send a follow-up. We also need to make sure the draft email is good as well.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nRan `make follow-up-eval` successfully. Accuracy went from 50% -> 94% over the test cases!\r\n\r\n```\r\nTotal cases evaluated: 10\r\nCorrect predictions: 5/10\r\nAccuracy: 50.0%\r\nRecall: 1.0\r\nPrecision: 0.16666666666666666\r\nTrue positives: 1\r\nFalse positives: 5\r\nFalse negatives: 0\r\nTrue negatives: 4\r\n```\r\n\r\n```\r\nTotal cases evaluated: 17\r\nCorrect predictions: 16/17\r\nAccuracy: 94.1%\r\nRecall: 1.0\r\nPrecision: 0.8333333333333334\r\nTrue positives: 5\r\nFalse positives: 1\r\nFalse negatives: 0\r\nTrue negatives: 11\r\n```\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2871",
+    "merged_at": "2025-10-24T23:29:31Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/placement-state): improve next steps generation",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nImproves the next steps generation by\r\n* using the placement intuition context getter\r\n* removing all emails and using the placement summaries instead. For tools that don't require knowing very specific details this seems like an ideal approach. I've found in general using all emails for large context placements results creates a lot of [context rot](https://research.trychroma.com/context-rot).\r\nExample:\r\n\r\n```\r\n**Placement Guidance for Celigo:**\r\n\r\n**Immediate Actions:**\r\n- Follow up with Zurich on their pricing target question - provide competitive range guidance per guidelines (e.g., \"we're seeing quotes in the $X range\") without sharing specific carrier names or exact premiums\r\n- Chase outstanding quotes from AIG, Sompo, Chubb, and Axis - quotes were due 10/23, now overdue\r\n- Coordinate with RT Specialty on AmTrust approach status\r\n\r\n**Key Considerations:**\r\n- 23 days until expiration (11/16) - time pressure building\r\n- Zurich showing strong interest and competitive intent after quoting last year\r\n- One declination (Beazley) due to controls - may indicate coverage challenges\r\n- Need multiple options for account team given tower structure discussions ($15M-$20M)\r\n\r\n**Next Steps:**\r\nApply negotiation guidelines once quotes received - can be more aggressive with competitive carriers, prioritize best coverage at best price for client.\r\n```\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2902",
+    "merged_at": "2025-10-28T20:04:49Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/intuition): structure retrieval function",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* Updating knowledge base context getter to deterministically return exact sections of the intuition document by using the LLM to return section ids instead of free text summary. This is a lot safer since the prior method is prone to hallucinations and difficult to debug. Note that the current implementation likely is less precise (i.e. will return more of the intuition doc than before) but it seems like we want to prioritize recall anyways\r\n* Decided to use YAML instead of markdown and JSON since it is structured while convenient for capturing long pieces of text\r\n* Moving around some code\r\n\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2903",
+    "merged_at": "2025-11-03T12:50:43Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "refactor(ai/retrieval): clean up existing code",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPrep for further changes detailed in https://www.notion.so/newfront/Placement-Understanding-Design-Proposal-29f63cbd78f88006bc1df892c867d6f8\r\n* caller specifies query for retrieval filtering\r\n* improved logging\r\n* general refactoring\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2976",
+    "merged_at": "2025-11-05T22:39:16Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "chore(ai/intuition): update knowledge base",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n* added intuition based on my operator shift week\r\n* adding more detail from source docs (specifically https://www.notion.so/newfront/Placement-Intuition-Knowledge-Base-24263cbd78f8802aabbcf57d41e8ce19 and https://docs.google.com/spreadsheets/d/1kkx4N-W1yHo7oo6KclqCvNpiKqD--0XwrwiJlG8EjmM/edit?gid=1591043975#gid=1591043975)\r\n* manually adding relevant intuition from #dev-placement-service and #placement-service from the past 2 weeks. This was pretty fast so I think manually reviewing Slack messages from the past year and adding relevant intuition would be feasible and useful\r\n* added intuition for SL forms\r\n* removed parts of KB that aren't relevant to the AI\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2998",
+    "merged_at": "2025-11-10T18:43:52Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/retrieval): determine relevancy and filter at conversation grain",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently filtering by relevant emails is supported. However it makes more sense to do this at the conversation (i.e. email thread) level as conversations are logical groupings of related info and filtering by emails can remove context in unexpected ways. This PR implements an approach that sort the emails within a conversation in reverse chronological order and the conversations in reverse chronological order based on the latest email in the conversation\r\n\r\nDoc for context: https://www.notion.so/newfront/Placement-Understanding-Design-Proposal-29f63cbd78f88006bc1df892c867d6f8\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nAdded unit tests and ran the replay script successfully calling the retrieval function\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/2987",
+    "merged_at": "2025-11-12T17:55:11Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(ai/retrieval): filter out gpt emails",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nI don't think gpt emails should ever be in context\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3012",
+    "merged_at": "2025-11-12T18:38:45Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/retrieval): turn on email retrieval filtering for all tools when emails are huge",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR turns on the LLM based filtering of emails for most AI tools that today inject all emails of a placement into context. This is only done when a placement has over 100 emails. I think this is pretty safe since\r\n* injecting over 100 emails likely doesn't perform well anyway due to context dilution\r\n* sacrificing some recall for greatly improved precision seems like an acceptable default\r\n* this should only trigger for ~15% of AI tool calls based on Ryan's analytics\r\n\r\nSome AI tools that injected all emails weren't touched because either\r\n* they generated a global summary\r\n* they did a simple task \r\n* their prompt handling was strange and needs to be refactored before implementing this, since the retrieval filtering uses the prompt to determine what's relevant\r\n\r\nDoc for context: https://www.notion.so/newfront/Placement-Understanding-Design-Proposal-29f63cbd78f88006bc1df892c867d6f8\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* replay script to call email retrieval function over a couple of cases ran successfully and as expected\r\n* `make test-placement-agent-sample` ran successfully\r\n* added unit tests\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3013",
+    "merged_at": "2025-11-13T18:11:37Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/retrieval): always group email context by conversation",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently when email context is constructed all emails are sorted in some kind of chronological order. However it doesn't make sense to interleave emails from different threads as continuity between related emails is lost. This PR groups related emails in an email thread together when email context is constructed and sorts them in reverse chronological order within the thread, and then sorts the conversations in reverse chronological order based on the latest email in a conversation.\r\n\r\nI considered making the old behavior configurable but I can't think of any case where that could be better. I removed it for good to avoid adding unnecessary complexity\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nUpdated unit tests, ran replay script over the retrieval function successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3014",
+    "merged_at": "2025-11-13T18:39:07Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "chore(ai/retrieval): update sort_newest_first param",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n`sort_newest_first` param isn't being used anywhere. We should remove because we shouldn't allow everything to be configurable to keep the retrieval interface as simple as possible\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3022",
+    "merged_at": "2025-11-17T21:19:19Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/retrieval): always include most recent conversations in context",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nMost recent conversations are likely the most relevant without knowing the content. We should always include them to prioritize recall in a precision careful way\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3023",
+    "merged_at": "2025-11-17T22:15:27Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/retrieval): decompose relevancy LLM calls to handle an arbitrarily large amount of emails",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently retrieval filtering does not take place if email tokens exceed a threshold designed to prevent context too long error. This is because the email tokens would exceed the filtering LLM call as well. This PR decomposes the retrieval filtering LLM call to support any amount of tokens by making multiple calls if needed in batches and stitching together the results.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3041",
+    "merged_at": "2025-11-18T16:11:05Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/retrieval): conversation summary fallback for long email context",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nInstead of filtering conversations classified as irrelevant out of the context, this PR compresses those conversations into LLM generated summaries.\r\n\r\nIn the future, we should generate conversation summaries off of inbound emails and store them in the db instead of generating them at runtime which will result in a lot of redundant LLM calls. However this is the quickest way to production and we aren't optimizing for cost/latency currently.\r\n\r\nSnippet of example context:\r\n\r\n```\r\n...\r\n\r\n<conversation_with_index_28>\r\n\r\n<email>\r\nContents of email 1\r\n</email>\r\n\r\n<email>\r\nContents of email 2\r\n</email>\r\n\r\n<email>\r\nContents of email 3\r\n</email>\r\n\r\n</conversation_with_index_28>\r\n\r\n<conversation_with_index_29>\r\nSummary: CNA sent a new business confirmation letter for GRAIL, Inc.'s submission, confirming receipt of their application for an EPS+ policy form under Professional and Management Liability. The policy includes multiple coverages: Employment Practices Liability, Directors and Officers Liability, Fiduciary Liability, Crime Insurance, Kidnap/Ransom/Extortion, Miscellaneous Professional Liability, and Network Security & Privacy. CNA provided contact information for the servicing underwriter for any questions. The confirmation serves as a record of submission but does not specify policy terms, premium, or limits at this stage.\r\n</conversation_with_index_29>\r\n\r\n<conversation_with_index_30>\r\nSummary: Sompo International confirmed receipt of GRAIL Inc.'s cyber liability submission and assigned underwriter Shubhangi Dalvi with contact information. The submission was cleared and assigned Guidewire reference number 0220508973 and ImageRight number 572837_GRAIL, Inc._1. This represents another carrier option in GRAIL's competitive cyber liability placement process targeting $35-50k premium levels.\r\n</conversation_with_index_30>\r\n\r\n...\r\n```\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* Tested replay script runs over `filter_email_context` dataset successfully and as expected\r\n* Updated/added unit tests\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3051",
+    "merged_at": "2025-11-19T15:29:13Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "chore(ai/tools): turn off email commentary",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThe email commentary currently isn't useful and makes it harder to operate in the Outlook inbox due to the spammy extra email drafts. I don't think it makes sense to leave and try to improve either since we're going in a different direction in terms of context.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3065",
+    "merged_at": "2025-11-19T20:59:02Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "chore(email): add comment back in",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3071",
+    "merged_at": "2025-11-20T16:27:14Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai/context): context generation tool v1",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR creates the `context_generator` tool which generates context for arbitrary queries defined in `context_generator_queries.json`. This tool is called on every inbound email to generate and store the context in the `content` tables for downstream use in the FE.\r\n\r\nThis first version of this does not enable any operator interaction but instead just shows generally useful queries defined in the codebase.\r\n\r\nSee this proposal for more details: https://www.notion.so/newfront/Dynamic-context-proposal-2aa63cbd78f880a4b3edc8985daa6769\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* `run_context_generator_locally.py` and `run_process_new_email_locally` run successfully with expected updates in `content` table:\r\n<img width=\"1613\" height=\"371\" alt=\"Screenshot 2025-11-23 at 10 16 15\u202fAM\" src=\"https://github.com/user-attachments/assets/c7374dc4-4f64-4847-8dca-91a75c3d0d16\" />\r\n* Added unit and integration tests\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3068",
+    "merged_at": "2025-12-02T21:10:40Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix: placement phase",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nNeeds to map `COMPLETE` values from `PlacementStage`\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3120",
+    "merged_at": "2025-12-03T19:23:22Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix: context query error",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3122",
+    "merged_at": "2025-12-04T00:05:06Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "chore: consolidate placement progress models",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nBreaking out related models from the `schema.py` god file. This change prepares further refactoring of how placement progress is captured\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* added unit tests\r\n* `make test-placement-agent-sample` ran successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3123",
+    "merged_at": "2025-12-04T15:12:27Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai): add backend endpoint for dynamic chat",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR creates a backend point that the FE can call to get context query data.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* Tested FE changes work with these BE changes locally\r\n* Added integration tests\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3109",
+    "merged_at": "2025-12-04T20:22:04Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(retrieval): calibrate context length logic",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nWe are seeing errors from context length exceeded in Anthropic calls (example: https://newfront.slack.com/archives/C09E5V05CJK/p1764887206658229)\r\n\r\nThese are occurring because 1. our token counter for some reason seems to under-estimate by about 25k and 2. Anthropic calls will error out if the input tokens exceed the context limit of 136k (currently 200k for the model we're using - 64k, number of tokens reserved for the output).\r\n\r\nThis PR\r\n* reduces the default max tokens value from 160k to 100k\r\n* applies compression after emails exceed 100k tokens (instead of just checking the number of emails)\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3130",
+    "merged_at": "2025-12-05T14:39:33Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(dynamic-chat): update queries",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nAdds queries and updates how they're structured to enable queries that apply to multiple placement phases\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3137",
+    "merged_at": "2025-12-05T16:41:05Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "chore(ai): remove unused follow up and correct course code",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3143",
+    "merged_at": "2025-12-08T15:12:38Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(eval): update email retrieval eval",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR updates email retrieval eval to support recent changes made to email retrieval. It also adds logger support for Datadog analysis and a make command\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nEval harness runs successfully\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3144",
+    "merged_at": "2025-12-08T16:02:49Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(eval): supporting chat in email retrieval eval",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nSupporting arbitrary chat queries in this eval and adding ground truth cases\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3148",
+    "merged_at": "2025-12-08T18:53:51Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(eval): supporting chat in email retrieval eval (part 2)",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3152",
+    "merged_at": "2025-12-09T16:15:54Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "fix(dynamic-chat): add guard",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3158",
+    "merged_at": "2025-12-09T16:49:53Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "refactor(dynamic-chat): update repository layer and tests",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3139",
+    "merged_at": "2025-12-09T16:51:28Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "refactor: apply resource pattern consistently",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nA part of the agent cleanup effort: https://docs.google.com/spreadsheets/d/1kcylnkw80d_kvG_nzia03FrR11GJL3lzUgqGOs1TEOc/edit?gid=0#gid=0\r\n\r\nThis PR co-locates the \"resource\" with the business logic in cases where the resource code is not shared. It also deprecates old online eval code. Additional refactoring will occur in an eval specific PR\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3201",
+    "merged_at": "2025-12-16T15:01:20Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "refactor(eval): deprecate unused objects",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR deprecates objects that are used in outdated eval scripts\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3202",
+    "merged_at": "2025-12-16T16:20:12Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(dynamic-chat): adding citations",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nMany (normal) chat questions requested the location of info i.e. which email contains info on X. See this analysis: https://www.notion.so/newfront/Chat-analysis-2c063cbd78f88003bf6aecaa7e2590e9\r\n\r\nThis PR adds a lightweight, unstructured BE implementation of citations for dynamic chat. In the future we should consider storing email IDs in the citations data and pointing to the relevant emails on the FE\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3184",
+    "merged_at": "2025-12-16T19:54:55Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "migration: placement stage (part 1: adding new field)",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nPart 1 of the migration from `placement_steps_status` to `placement_stage` adds the new field to all relevant tables/objects\r\n\r\nNext steps:\r\n* update business logic to populate `placement_stage`\r\n* backfill `placement_stage`\r\n* point BE to new `placement_stage` field\r\n* point FE to new `placement_stage` field\r\n* remove `placement_steps_status` business logic and field\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n`make test-placement-agent-sample` runs successfully after migration is applied\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3142",
+    "merged_at": "2025-12-17T21:00:05Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "migration: placement stage (part 2: update business logic)",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR populates the `placement_stage` field on every inbound email\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nVerified `run_process_new_email_locally.py` updates the `placement_stage` field in the `placement_journeys` table\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3216",
+    "merged_at": "2025-12-18T18:28:57Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "refactor(eval): general clean-up (part 1: organizing code)",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nTo make this refactor easier to review/debug, the first part simply renames and moves code around\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n`make test-email-context-retrieval max_emails=50` looked good\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3220",
+    "merged_at": "2025-12-19T14:56:03Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(ai): generate and store conversation summaries (part 1: trigger on inbound email)",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR generates a conversation summary for the email thread of every inbound email and stores it in the db. Part 2 will trigger conversation summary generation during retrieval if retrieval tries to fetch the conversation summary but it doesn't exist.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n* added unit and integration tests\r\n* tested `process_new_email` interacts with the database as expected\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3155",
+    "merged_at": "2025-12-22T16:05:26Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "feat(dynamic-chat): batch LLM calls for non-large context",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nCurrently, a response is generated for each dynamic chat query in a dedicated LLM call. However this\r\n* is wasteful because the same context could be passed into every query, and there could be something like >10 query responses generated on every inbound email\r\n* adds unnecessary complexity and can spam logs\r\n\r\nOn the other hand, we can't use the same context for every query on a placement if the email context is long since we need to compress the email context in a way that retains relevant info for each specific query.\r\n\r\nThis PR provides a balanced solution by batching responses for all queries generated for a placement if the context is relatively small (<100k tokens). In these cases no compression is done on the context so it can be shared across all queries. The batched approach should apply to >90% of cases since most of our placements do not have over 100k tokens in emails.\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3224",
+    "merged_at": "2025-12-22T16:45:40Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  },
+  {
+    "title": "migration: placement stage (part 3: backfill)",
+    "description": "# Changes\r\n<!-- In a few sentences, provide the what and why for this change -->\r\n\r\nThis PR backfills the `placement_stage` field based on `placement_steps_status`\r\n\r\n# Testing\r\n<!-- How did you test your changes -->\r\n\r\nRan the script locally and db results looked as expected\r\n\r\n# JIRA Ticket (if applicable)\r\n<!-- Link your JIRA tickets here -->\r\n",
+    "url": "https://github.com/newfront-insurance/python-backend/pull/3223",
+    "merged_at": "2025-12-22T18:17:41Z",
+    "labels": [
+      "api-placement-service"
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "ai-self-review"
+version = "0.1.0"
+description = "Script to fetch merged PRs from GitHub"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.31.0"
+openai = "^1.50.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
