@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .venv/
 merged_prs_2025.json
+self_review_summary.md

@@ -8,6 +8,8 @@ from pathlib import Path
 from openai import OpenAI
 from pydantic import BaseModel
 
+from config_loader import load_config
+
 
 class PullRequest(BaseModel):
     title: str
@@ -27,9 +29,9 @@ class Secrets(BaseModel):
     openai_api_key: str
 
 
-def load_prs() -> list[PullRequest]:
+def load_prs(year: int) -> list[PullRequest]:
     """Load merged PRs from JSON file."""
-    prs_path = Path(__file__).parent / "merged_prs_2025.json"
+    prs_path = Path(__file__).parent / f"merged_prs_{year}.json"
     with open(prs_path, encoding="utf-8") as f:
         data = json.load(f)
     return [PullRequest.model_validate(pr) for pr in data]
@@ -46,8 +48,11 @@ def group_prs_by_label(prs: list[PullRequest]) -> dict[str, list[PullRequest]]:
     """Group PRs by their labels."""
     grouped: dict[str, list[PullRequest]] = defaultdict(list)
     for pr in prs:
-        for label in pr.labels:
-            grouped[label].append(pr)
+        if pr.labels:
+            for label in pr.labels:
+                grouped[label].append(pr)
+        else:
+            grouped["Unlabeled"].append(pr)
     return dict(grouped)
 
 
@@ -63,11 +68,11 @@ def format_prs_for_prompt(prs: list[PullRequest]) -> str:
     return "\n".join(lines)
 
 
-def summarize_label(client: OpenAI, label: str, prs: list[PullRequest]) -> str:
+def summarize_label(client: OpenAI, label: str, prs: list[PullRequest], year: int) -> str:
     """Summarize all PRs for a given label into high-level bullet points."""
     prs_text = format_prs_for_prompt(prs)
 
-    prompt = f"""You are helping an engineer write their performance self-review. Below are {len(prs)} pull requests they merged in 2025 under the "{label}" project/label.
+    prompt = f"""You are helping an engineer write their performance self-review. Below are {len(prs)} pull requests they merged in {year} under the "{label}" project/label.
 
 Analyze these PRs and summarize the key themes, accomplishments, and impact into 3-7 high-level bullet points suitable for a performance review. Focus on:
 - Major features or capabilities delivered
@@ -93,10 +98,13 @@ Provide the summary as bullet points:"""
 
 
 def main():
+    config = load_config()
+    year = config.year
+    
     secrets = load_secrets()
     client = OpenAI(api_key=secrets.openai_api_key)
 
-    prs = load_prs()
+    prs = load_prs(year)
     grouped = group_prs_by_label(prs)
 
     print("=" * 60)
@@ -106,7 +114,7 @@ def main():
     summaries = {}
     for label, label_prs in sorted(grouped.items()):
         print(f"\nSummarizing {label} ({len(label_prs)} PRs)...")
-        summary = summarize_label(client, label, label_prs)
+        summary = summarize_label(client, label, label_prs, year)
         summaries[label] = summary
 
         print(f"\n### {label.upper()} ###")
@@ -116,7 +124,7 @@ def main():
     # Write summaries to file
     output_path = Path(__file__).parent / "self_review_summary.md"
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write("# Performance Self-Review Summary (2025)\n\n")
+        f.write(f"# Performance Self-Review Summary ({year})\n\n")
         for label, summary in summaries.items():
             f.write(f"## {label}\n\n")
             f.write(summary)

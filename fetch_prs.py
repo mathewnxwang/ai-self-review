@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Fetch merged PRs from newfront-insurance/python-backend for 2025."""
+"""Fetch merged PRs from a configured repository for a specified year."""
 
 import json
 import requests
 from datetime import datetime
 from pathlib import Path
+
+from config_loader import load_config
 
 
 def load_secrets():
@@ -14,13 +16,12 @@ def load_secrets():
         raise FileNotFoundError(
             "secrets.json not found. Please create it with your GitHub token and username."
         )
-    with open(secrets_path) as f:
+    with open(secrets_path, encoding="utf-8") as f:
         return json.load(f)
 
 
-def fetch_merged_prs(token: str, username: str) -> list[dict]:
-    """Fetch all PRs created by the user and merged in 2025."""
-    repo = "newfront-insurance/python-backend"
+def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[dict]:
+    """Fetch all PRs created by the user and merged in the specified year."""
     url = f"https://api.github.com/repos/{repo}/pulls"
     headers = {
         "Authorization": f"token {token}",
@@ -31,9 +32,9 @@ def fetch_merged_prs(token: str, username: str) -> list[dict]:
     page = 1
     per_page = 100
     
-    # Date range for 2025
-    start_date = datetime(2025, 1, 1)
-    end_date = datetime(2025, 12, 31, 23, 59, 59)
+    # Date range for the specified year
+    start_date = datetime(year, 1, 1)
+    end_date = datetime(year, 12, 31, 23, 59, 59)
     
     print(f"Fetching merged PRs for {username} from {repo}...")
     
@@ -44,7 +45,7 @@ def fetch_merged_prs(token: str, username: str) -> list[dict]:
             "page": page,
         }
         
-        response = requests.get(url, headers=headers, params=params)
+        response = requests.get(url, headers=headers, params=params, timeout=30)
         response.raise_for_status()
         
         prs = response.json()
@@ -61,7 +62,7 @@ def fetch_merged_prs(token: str, username: str) -> list[dict]:
             if not author or author.get("login", "").lower() != username.lower():
                 continue
             
-            # Parse merge date and filter by 2025
+            # Parse merge date and filter by year
             merged_at = datetime.fromisoformat(pr["merged_at"].replace("Z", "+00:00"))
             merged_at_naive = merged_at.replace(tzinfo=None)
             
@@ -83,6 +84,10 @@ def fetch_merged_prs(token: str, username: str) -> list[dict]:
 
 
 def main():
+    config = load_config()
+    repo = config.repo
+    year = config.year
+    
     secrets = load_secrets()
     token = secrets["github_token"]
     username = secrets["github_username"]
@@ -91,17 +96,17 @@ def main():
         print("Error: Please update secrets.json with your actual GitHub token and username.")
         return
     
-    prs = fetch_merged_prs(token, username)
+    prs = fetch_merged_prs(token, username, repo, year)
     
     # Sort by merge date
     prs.sort(key=lambda x: x["merged_at"])
     
     # Write output
-    output_path = Path(__file__).parent / "merged_prs_2025.json"
-    with open(output_path, "w") as f:
+    output_path = Path(__file__).parent / f"merged_prs_{year}.json"
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(prs, f, indent=2)
     
-    print(f"\nFound {len(prs)} merged PRs in 2025")
+    print(f"\nFound {len(prs)} merged PRs in {year}")
     print(f"Output written to {output_path}")
 
 
