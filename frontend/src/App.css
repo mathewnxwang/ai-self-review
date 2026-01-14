@@ -169,6 +169,91 @@ body {
   line-height: 1.5;
 }
 
+.form-group textarea[rows="3"] {
+  min-height: auto;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+}
+
+.form-hint {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin-top: -0.25rem;
+}
+
+/* Repo Input Container */
+.repo-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  min-height: 48px;
+  align-items: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: text;
+}
+
+.repo-input-container:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+.repo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.repo-chip-remove {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0;
+  margin-left: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.repo-chip-remove:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.repo-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+.repo-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
 /* Buttons */
 .generate-button {
   padding: 1rem 2rem;
@@ -180,6 +265,10 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .generate-button:hover:not(:disabled) {
@@ -190,6 +279,22 @@ body {
 .generate-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .copy-button {

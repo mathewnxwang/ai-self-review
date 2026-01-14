@@ -27,11 +27,18 @@ function App() {
     const saved = localStorage.getItem('selfReviewFormData');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return {
+          repos: parsed.repos || ['newfront-insurance/python-backend'],
+          year: parsed.year || 2025,
+          github_username: parsed.github_username || '',
+          github_token: '',
+          role_requirements: parsed.role_requirements || DEFAULT_ROLE_REQUIREMENTS,
+        };
       } catch {
         return {
-          repo: '',
-          year: new Date().getFullYear(),
+          repos: ['newfront-insurance/python-backend'],
+          year: 2025,
           github_username: '',
           github_token: '',
           role_requirements: DEFAULT_ROLE_REQUIREMENTS,
@@ -39,8 +46,8 @@ function App() {
       }
     }
     return {
-      repo: '',
-      year: new Date().getFullYear(),
+      repos: ['newfront-insurance/python-backend'],
+      year: 2025,
       github_username: '',
       github_token: '',
       role_requirements: DEFAULT_ROLE_REQUIREMENTS,
@@ -50,6 +57,7 @@ function App() {
   const [summary, setSummary] = useState('');
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
+  const [repoInput, setRepoInput] = useState('');
 
   // Save non-sensitive form data to localStorage
   useEffect(() => {
@@ -58,14 +66,44 @@ function App() {
       github_token: '', // Don't persist tokens
     };
     localStorage.setItem('selfReviewFormData', JSON.stringify(dataToSave));
-  }, [formData.repo, formData.year, formData.github_username, formData.role_requirements]);
+  }, [formData.repos, formData.year, formData.github_username, formData.role_requirements]);
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
   };
 
+  const handleRepoInputKeyDown = (e) => {
+    if (e.key === 'Enter' && repoInput.trim()) {
+      e.preventDefault();
+      const trimmedRepo = repoInput.trim();
+      if (!formData.repos.includes(trimmedRepo)) {
+        setFormData({ ...formData, repos: [...formData.repos, trimmedRepo] });
+      }
+      setRepoInput('');
+    } else if (e.key === 'Backspace' && repoInput === '' && formData.repos.length > 0) {
+      // Remove last repo if backspace is pressed on empty input
+      setFormData({ 
+        ...formData, 
+        repos: formData.repos.slice(0, -1) 
+      });
+    }
+  };
+
+  const removeRepo = (repoToRemove) => {
+    setFormData({ 
+      ...formData, 
+      repos: formData.repos.filter(repo => repo !== repoToRemove) 
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (formData.repos.length === 0) {
+      setError('Please add at least one repository');
+      return;
+    }
+    
     setGenerating(true);
     setError('');
     setSummary('');
@@ -77,7 +115,7 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          repo: formData.repo,
+          repos: formData.repos,
           year: parseInt(formData.year),
           github_username: formData.github_username,
           github_token: formData.github_token,
@@ -121,15 +159,38 @@ function App() {
             
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="repo">Repository (owner/repo)</label>
-                <input
-                  id="repo"
-                  type="text"
-                  value={formData.repo}
-                  onChange={handleChange('repo')}
-                  placeholder="myorg/myrepo"
-                  required
-                />
+                <label htmlFor="repos">Repositories (owner/repo)</label>
+                <div 
+                  className="repo-input-container"
+                  onClick={() => document.getElementById('repos')?.focus()}
+                >
+                  {formData.repos.map((repo, index) => (
+                    <span key={index} className="repo-chip">
+                      {repo}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeRepo(repo);
+                        }}
+                        className="repo-chip-remove"
+                        aria-label={`Remove ${repo}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    id="repos"
+                    type="text"
+                    value={repoInput}
+                    onChange={(e) => setRepoInput(e.target.value)}
+                    onKeyDown={handleRepoInputKeyDown}
+                    placeholder={formData.repos.length === 0 ? "Type repo name and press Enter (e.g., owner/repo)" : "Add another repository..."}
+                    className="repo-input"
+                  />
+                </div>
+                <small className="form-hint">Type a repository name and press Enter to add it</small>
               </div>
               
               <div className="form-group">
@@ -205,7 +266,14 @@ function App() {
             className="generate-button"
             disabled={generating}
           >
-            {generating ? 'Generating... (this may take a minute)' : 'Generate Self-Review'}
+            {generating ? (
+              <>
+                <span className="spinner"></span>
+                <span>Generating... (this may take a minute)</span>
+              </>
+            ) : (
+              'Generate Self-Review'
+            )}
           </button>
 
           {error && (
@@ -224,7 +292,15 @@ function App() {
               </button>
             </div>
             <div className="summary-content">
-              <ReactMarkdown>{summary}</ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  a: ({ node, ...props }) => (
+                    <a {...props} target="_blank" rel="noopener noreferrer" />
+                  ),
+                }}
+              >
+                {summary}
+              </ReactMarkdown>
             </div>
           </div>
         )}

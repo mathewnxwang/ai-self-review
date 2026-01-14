@@ -92,7 +92,7 @@ def generate_summary():
     
     Expects JSON body:
     {
-        "repo": "owner/repo",
+        "repos": ["owner/repo1", "owner/repo2"],
         "year": 2025,
         "github_username": "username",
         "github_token": "ghp_xxx",
@@ -108,13 +108,17 @@ def generate_summary():
         data = request.json
         
         # Validate required fields
-        required_fields = ["repo", "year", "github_username", "github_token", "role_requirements"]
+        required_fields = ["repos", "year", "github_username", "github_token", "role_requirements"]
         missing = [f for f in required_fields if not data.get(f)]
         if missing:
             logger.warning("Missing required fields: %s", missing)
             return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
         
-        repo = data["repo"]
+        repos = data["repos"]
+        if not isinstance(repos, list) or len(repos) == 0:
+            logger.warning("Invalid repos field: must be a non-empty list")
+            return jsonify({"error": "repos must be a non-empty list"}), 400
+        
         year = int(data["year"])
         github_username = data["github_username"]
         github_token = data["github_token"]
@@ -124,31 +128,48 @@ def generate_summary():
         secrets = load_secrets()
         openai_api_key = secrets.openai_api_key
         
-        logger.info("Generating summary for %s/%d", repo, year)
+        logger.info("Generating summary for %d repos/%d", len(repos), year)
         
-        # Step 1: Fetch PRs from GitHub (in memory)
+        # Step 1: Fetch PRs from GitHub for all repos (in memory)
         logger.info("Fetching PRs from GitHub...")
-        prs = fetch_merged_prs(
-            token=github_token,
-            username=github_username,
-            repo=repo,
-            year=year
-        )
+        all_prs = []
+        repos_with_prs = []
         
-        if not prs:
-            logger.warning("No PRs found for %s in %d", github_username, year)
+        for repo in repos:
+            logger.info("Fetching PRs from %s...", repo)
+            repo_prs = fetch_merged_prs(
+                token=github_token,
+                username=github_username,
+                repo=repo,
+                year=year
+            )
+            if repo_prs:
+                # Add repo information to each PR for tracking
+                for pr in repo_prs:
+                    pr["source_repo"] = repo
+                all_prs.extend(repo_prs)
+                repos_with_prs.append(repo)
+                logger.info("Found %d PRs from %s", len(repo_prs), repo)
+            else:
+                logger.info("No PRs found in %s", repo)
+        
+        if not all_prs:
+            logger.warning("No PRs found for %s in any repository for %d", github_username, year)
+            repos_str = ", ".join(f"**{repo}**" for repo in repos)
             return jsonify({
-                "summary": f"# No PRs Found\n\nNo merged PRs found for user **{github_username}** in repository **{repo}** for year **{year}**."
+                "summary": f"# No PRs Found\n\nNo merged PRs found for user **{github_username}** in repositories {repos_str} for year **{year}**."
             })
         
-        logger.info("Found %d PRs, generating summary...", len(prs))
+        logger.info("Found %d total PRs across %d repos, generating summary...", len(all_prs), len(repos_with_prs))
         
         # Step 2: Summarize PRs (in memory)
+        # Use the first repo as the default label for unlabeled PRs
         summary = summarize_prs_in_memory(
-            prs=prs,
+            prs=all_prs,
             year=year,
             openai_api_key=openai_api_key,
-            role_requirements=role_requirements
+            role_requirements=role_requirements,
+            repo=repos[0] if repos else "unknown"
         )
         
         logger.info("Summary generated successfully")

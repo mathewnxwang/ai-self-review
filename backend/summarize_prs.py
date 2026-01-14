@@ -2,6 +2,7 @@
 """Summarize merged PRs by label using LLM for performance self-review."""
 
 import json
+import os
 from collections import defaultdict
 from pathlib import Path
 
@@ -23,6 +24,18 @@ class PullRequest(BaseModel):
         return self.merged_at[:10]
 
 
+class PRCitation(BaseModel):
+    """A PR citation with title and URL."""
+    model_config = ConfigDict(
+        json_schema_extra={
+            "additionalProperties": False
+        }
+    )
+    
+    title: str = Field(description="The title of the PR")
+    url: str = Field(description="The GitHub PR URL")
+
+
 class SummaryBullet(BaseModel):
     """A single summary bullet point with citations."""
     model_config = ConfigDict(
@@ -31,10 +44,11 @@ class SummaryBullet(BaseModel):
         }
     )
     
+    title: str = Field(description="A 3-5 word bolded title summarizing the bullet point (e.g., 'Built Feature X', 'Refactored Component Y', 'Added Test Coverage')")
     work_done: str = Field(description="Description of what was done")
     significance: str = Field(description="Description of how the work_done aligns with the job requirements and could be represented in a performance review")
     career_area: str = Field(description="The job requirements area this bullet point belongs to, as defined in the role requirements document")
-    pr_urls: list[str] = Field(description="List of GitHub PR URLs that support this bullet point")
+    pr_citations: list[PRCitation] = Field(description="List of PR citations (title and URL) that support this bullet point")
 
 
 class SummaryResponse(BaseModel):
@@ -62,11 +76,19 @@ def load_prs(year: int) -> list[PullRequest]:
 
 
 def load_secrets() -> Secrets:
-    """Load secrets from secrets.json."""
-    # secrets.json is in project root, one level up from backend/
+    """Load secrets from environment variable or secrets.json."""
+    # Check for environment variable first (for stateless deployments)
+    openai_api_key = os.environ.get("OPENAI_API_KEY")
+    if openai_api_key:
+        return Secrets(openai_api_key=openai_api_key)
+    
+    # Fall back to secrets.json (for local development)
     secrets_path = Path(__file__).parent.parent / "secrets.json"
-    with open(secrets_path, encoding="utf-8") as f:
-        return Secrets.model_validate(json.load(f))
+    if secrets_path.exists():
+        with open(secrets_path, encoding="utf-8") as f:
+            return Secrets.model_validate(json.load(f))
+    
+    raise ValueError("OPENAI_API_KEY environment variable or secrets.json file required")
 
 
 def load_job_requirements() -> str:
@@ -92,10 +114,16 @@ def format_summary_with_citations(summary_response: SummaryResponse) -> str:
         lines.append(f"### {area}")
         lines.append("")
         for i, bullet in enumerate(grouped_by_area[area]):
-            citation_text = ", ".join(f"[{j+1}]({url})" for j, url in enumerate(bullet.pr_urls))
-            lines.append(f"- **Work Done:** {bullet.work_done}")
-            lines.append(f"  **Significance:**")
-            lines.append(f"  {bullet.significance} ({citation_text})")
+            lines.append(f"- **{bullet.title}**")
+            lines.append("")
+            lines.append(f"  **Work Done:** {bullet.work_done}")
+            lines.append("")
+            lines.append("  **Cited PRs:**")
+            for citation in bullet.pr_citations:
+                lines.append(f"  - [{citation.title}]({citation.url})")
+            lines.append("")
+            lines.append("  **Significance:**")
+            lines.append(f"  {bullet.significance}")
             if i < len(grouped_by_area[area]) - 1:
                 lines.append("")
         lines.append("")
@@ -103,7 +131,7 @@ def format_summary_with_citations(summary_response: SummaryResponse) -> str:
     return "\n".join(lines)
 
 
-def group_prs_by_label(prs: list[PullRequest]) -> dict[str, list[PullRequest]]:
+def group_prs_by_label(prs: list[PullRequest], repo: str) -> dict[str, list[PullRequest]]:
     """Group PRs by their labels."""
     grouped: dict[str, list[PullRequest]] = defaultdict(list)
     for pr in prs:
@@ -111,7 +139,7 @@ def group_prs_by_label(prs: list[PullRequest]) -> dict[str, list[PullRequest]]:
             for label in pr.labels:
                 grouped[label].append(pr)
         else:
-            grouped["Unlabeled"].append(pr)
+            grouped[repo].append(pr)
     return dict(grouped)
 
 
@@ -139,6 +167,7 @@ JOB REQUIREMENTS:
 {job_requirements}
 
 Analyze these PRs and summarize the key themes, accomplishments, and impact into 3-7 high-level bullet points. For each bullet point, provide:
+- **title**: A 3-5 word bolded title summarizing the bullet point (e.g., "Built Feature X", "Refactored Component Y", "Added Test Coverage")
 - **work_done**: A factual description of what was done (e.g., "Built feature X", "Refactored component Y", "Added tests for Z")
 - **significance**: How this work aligns with the job requirements above and could be represented in a performance review context. Reference specific aspects of the job requirements that this work demonstrates (e.g., "Demonstrates ownership and impact by delivering end-to-end features that make net positive impact to the business", "Shows commitment to technical craft through high-quality code and reliability improvements", "Highlights teamwork and collaboration by proactively unblocking team members")
 - **career_area**: The job requirements area this bullet point belongs to. Determine the appropriate area based on the job requirements document above. Use the exact section heading name from the document (e.g., if the document has a section called "Ownership & Impact", use that exact name)
@@ -152,14 +181,14 @@ Focus on:
 
 Be specific but concise. Use action verbs. Quantify impact where possible. When describing significance, explicitly connect the work to the job requirements.
 
-For each bullet point, cite the relevant PR URLs that support that point. A bullet point can cite one or more PRs.
+For each bullet point, cite the relevant PRs that support that point. Include the PR title and URL for each citation. A bullet point can cite one or more PRs.
 
 PRs:
 {prs_text}"""
 
     # Use OpenAI's structured outputs API with Pydantic model (stable API)
     response = client.chat.completions.create(  # type: ignore[call-overload]
-        model="gpt-4o",
+        model="gpt-5.2",
         max_completion_tokens=2048,
         messages=[{"role": "user", "content": prompt}],
         response_format={
@@ -185,9 +214,9 @@ PRs:
     # Validate that all cited URLs are from the provided PRs
     all_urls = set(pr_urls)
     for bullet in summary.bullets:
-        for url in bullet.pr_urls:
-            if url not in all_urls:
-                raise ValueError(f"Cited URL {url} is not in the provided PRs")
+        for citation in bullet.pr_citations:
+            if citation.url not in all_urls:
+                raise ValueError(f"Cited URL {citation.url} is not in the provided PRs")
     
     return summary
 
@@ -196,7 +225,8 @@ def summarize_prs_in_memory(
     prs: list[dict],
     year: int,
     openai_api_key: str,
-    role_requirements: str
+    role_requirements: str,
+    repo: str
 ) -> str:
     """
     Summarize PRs in memory without file I/O.
@@ -206,6 +236,7 @@ def summarize_prs_in_memory(
         year: The year for the summary
         openai_api_key: OpenAI API key
         role_requirements: Job requirements text
+        repo: Repository name (owner/repo) to use as section title for unlabeled PRs
         
     Returns:
         Markdown formatted summary string
@@ -216,7 +247,7 @@ def summarize_prs_in_memory(
     pr_objects = [PullRequest.model_validate(pr) for pr in prs]
     
     # Group by label
-    grouped = group_prs_by_label(pr_objects)
+    grouped = group_prs_by_label(pr_objects, repo)
     
     summaries = {}
     for label, label_prs in sorted(grouped.items()):
@@ -238,13 +269,14 @@ def summarize_prs_in_memory(
 def main():
     config = load_config()
     year = config.year
+    repo = config.repo
     
     secrets = load_secrets()
     client = OpenAI(api_key=secrets.openai_api_key)
     job_requirements = load_job_requirements()
 
     prs = load_prs(year)
-    grouped = group_prs_by_label(prs)
+    grouped = group_prs_by_label(prs, repo)
 
     print("=" * 60)
     print("PERFORMANCE SELF-REVIEW SUMMARY")
