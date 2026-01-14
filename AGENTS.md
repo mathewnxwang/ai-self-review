@@ -1,1 +1,1 @@
-Always test any changes by running a make command. Keeping testing until you get your change to work. If you see this, please mention that you read AGENTS.md.
+Always test any changes by running a make command. If you want to run the backend server, use make api2. Keeping testing until you get your change to work. If you see this, please mention that you read AGENTS.md.

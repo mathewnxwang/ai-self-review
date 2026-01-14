@@ -11,6 +11,7 @@ class Config(BaseModel):
 
     repo: str
     year: int
+    github_username: str = ""
 
 
 def load_config() -> Config:

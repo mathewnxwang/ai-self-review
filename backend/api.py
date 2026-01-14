@@ -1,227 +1,176 @@
 #!/usr/bin/env python3
-"""Flask API server for the self-review frontend."""
+"""Flask API server for the self-review frontend - stateless version."""
 
-import json
-import subprocess
-from pathlib import Path
-from flask import Flask, jsonify, request
+import logging
+import os
+from functools import wraps
+
+from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
 
-from .config_loader import load_config, Config
+from .fetch_prs import fetch_merged_prs
+from .summarize_prs import load_secrets, summarize_prs_in_memory
 
-app = Flask(__name__)
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
+
+app = Flask(__name__, static_folder='../frontend/dist', static_url_path='')
 CORS(app)
 
-# Project root is one level up from backend/
-BASE_DIR = Path(__file__).parent.parent
+# HTTP Basic Auth
+def check_auth(username: str, password: str) -> bool:
+    """Check if username/password combination is valid."""
+    expected_user = os.environ.get("APP_USERNAME", "admin")
+    expected_pass = os.environ.get("APP_PASSWORD", "changeme")
+    return username == expected_user and password == expected_pass
 
 
-@app.route("/api/config", methods=["GET"])
-def get_config():
-    """Get current configuration."""
-    try:
-        config = load_config()
-        return jsonify({"repo": config.repo, "year": config.year})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+def requires_auth(f):
+    """Decorator that requires HTTP Basic Auth."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return Response(
+                'Unauthorized. Please provide valid credentials.',
+                401,
+                {'WWW-Authenticate': 'Basic realm="Login Required"'}
+            )
+        return f(*args, **kwargs)
+    return decorated
 
 
-@app.route("/api/config", methods=["POST"])
-def update_config():
-    """Update configuration."""
-    try:
-        data = request.json
-        config_path = BASE_DIR / "config.json"
-        
-        # Validate data
-        if "repo" not in data or "year" not in data:
-            return jsonify({"error": "Missing required fields: repo, year"}), 400
-        
-        # Validate year is an integer
-        try:
-            year = int(data["year"])
-        except (ValueError, TypeError):
-            return jsonify({"error": "Year must be an integer"}), 400
-        
-        # Write to config.json
-        with open(config_path, "w", encoding="utf-8") as f:
-            json.dump({"repo": data["repo"], "year": year}, f, indent=2)
-        
-        return jsonify({"repo": data["repo"], "year": year})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# Apply auth to all API routes
+@app.before_request
+def require_login():
+    """Require authentication for all routes except static files."""
+    # Skip auth for static files and OPTIONS requests (CORS preflight)
+    if request.method == 'OPTIONS':
+        return None
+    if request.path == '/' or request.path.startswith('/assets'):
+        return None
+    
+    auth = request.authorization
+    if not auth or not check_auth(auth.username, auth.password):
+        return Response(
+            'Unauthorized',
+            401,
+            {'WWW-Authenticate': 'Basic realm="Login Required"'}
+        )
 
 
-@app.route("/api/job-requirements", methods=["GET"])
-def get_job_requirements():
-    """Get job requirements content."""
-    try:
-        requirements_path = BASE_DIR / "role_requirements.md"
-        if not requirements_path.exists():
-            return jsonify({"content": ""})
-        
-        with open(requirements_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        
-        return jsonify({"content": content})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# Log all requests
+@app.before_request
+def log_request_info():
+    """Log incoming request details."""
+    logger.info("Request: %s %s", request.method, request.path)
 
 
-@app.route("/api/job-requirements", methods=["POST"])
-def save_job_requirements():
-    """Save job requirements content."""
-    try:
-        data = request.json
-        if "content" not in data:
-            return jsonify({"error": "Missing required field: content"}), 400
-        
-        requirements_path = BASE_DIR / "role_requirements.md"
-        with open(requirements_path, "w", encoding="utf-8") as f:
-            f.write(data["content"])
-        
-        return jsonify({"message": "Job requirements saved successfully"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+@app.after_request
+def log_response_info(response):
+    """Log response status."""
+    logger.info("Response: %s %s - %d", request.method, request.path, response.status_code)
+    return response
 
 
-@app.route("/api/summary", methods=["GET"])
-def get_summary():
-    """Get self-review summary content."""
-    try:
-        summary_path = BASE_DIR / "self_review_summary.md"
-        if not summary_path.exists():
-            return jsonify({"content": ""})
-        
-        with open(summary_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        
-        return jsonify({"content": content})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/secrets", methods=["GET"])
-def get_secrets():
-    """Get GitHub credentials (without sensitive values)."""
-    try:
-        secrets_path = BASE_DIR / "secrets.json"
-        if not secrets_path.exists():
-            return jsonify({
-                "github_username": "",
-                "github_token": ""
-            })
-        
-        with open(secrets_path, "r", encoding="utf-8") as f:
-            secrets = json.load(f)
-        
-        # Return masked token for display (show last 4 chars)
-        github_token = secrets.get("github_token", "")
-        masked_token = "•" * max(0, len(github_token) - 4) + github_token[-4:] if len(github_token) > 4 else "•" * len(github_token)
-        
-        return jsonify({
-            "github_username": secrets.get("github_username", ""),
-            "github_token": masked_token,
-            "has_token": bool(github_token and github_token != "your_github_pat_here")
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/secrets", methods=["POST"])
-def save_secrets():
-    """Save GitHub credentials."""
-    try:
-        data = request.json
-        secrets_path = BASE_DIR / "secrets.json"
-        
-        # Load existing secrets if they exist (preserve openai_api_key if it exists)
-        existing_secrets = {}
-        if secrets_path.exists():
-            with open(secrets_path, "r", encoding="utf-8") as f:
-                existing_secrets = json.load(f)
-        
-        # Update with new values (only update provided fields)
-        if "github_username" in data:
-            existing_secrets["github_username"] = data["github_username"]
-        if "github_token" in data:
-            existing_secrets["github_token"] = data["github_token"]
-        # Note: openai_api_key is not configurable via UI, preserve existing value
-        
-        # Ensure required fields exist
-        if "github_token" not in existing_secrets:
-            existing_secrets["github_token"] = "your_github_pat_here"
-        if "github_username" not in existing_secrets:
-            existing_secrets["github_username"] = "your_username_here"
-        # openai_api_key must be set manually in secrets.json if not present
-        
-        # Write to secrets.json
-        with open(secrets_path, "w", encoding="utf-8") as f:
-            json.dump(existing_secrets, f, indent=2)
-        
-        return jsonify({"message": "Secrets saved successfully"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# Serve frontend
+@app.route('/')
+def serve_frontend():
+    """Serve the frontend index.html."""
+    return app.send_static_file('index.html')
 
 
 @app.route("/api/generate-summary", methods=["POST"])
 def generate_summary():
-    """Trigger the fetch and summarize process."""
+    """
+    Generate a self-review summary - fully stateless.
+    
+    Expects JSON body:
+    {
+        "repo": "owner/repo",
+        "year": 2025,
+        "github_username": "username",
+        "github_token": "ghp_xxx",
+        "role_requirements": "# Job Requirements\\n..."
+    }
+    
+    Returns:
+    {
+        "summary": "# Performance Self-Review Summary...\\n..."
+    }
+    """
     try:
-        output_parts = []
+        data = request.json
         
-        # First, fetch PRs
-        fetch_result = subprocess.run(
-            ["poetry", "run", "python", "-m", "backend.fetch_prs"],
-            cwd=BASE_DIR,
-            capture_output=True,
-            text=True,
-            timeout=300  # 5 minute timeout
+        # Validate required fields
+        required_fields = ["repo", "year", "github_username", "github_token", "role_requirements"]
+        missing = [f for f in required_fields if not data.get(f)]
+        if missing:
+            logger.warning("Missing required fields: %s", missing)
+            return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
+        
+        repo = data["repo"]
+        year = int(data["year"])
+        github_username = data["github_username"]
+        github_token = data["github_token"]
+        role_requirements = data["role_requirements"]
+        
+        # Load OpenAI API key from secrets.json
+        secrets = load_secrets()
+        openai_api_key = secrets.openai_api_key
+        
+        logger.info("Generating summary for %s/%d", repo, year)
+        
+        # Step 1: Fetch PRs from GitHub (in memory)
+        logger.info("Fetching PRs from GitHub...")
+        prs = fetch_merged_prs(
+            token=github_token,
+            username=github_username,
+            repo=repo,
+            year=year
         )
         
-        output_parts.append("=== Fetch PRs ===")
-        output_parts.append(fetch_result.stdout)
-        if fetch_result.stderr:
-            output_parts.append(fetch_result.stderr)
-        
-        if fetch_result.returncode != 0:
+        if not prs:
+            logger.warning("No PRs found for %s in %d", github_username, year)
             return jsonify({
-                "error": "Failed to fetch PRs",
-                "details": fetch_result.stderr,
-                "output": "\n".join(output_parts)
-            }), 500
+                "summary": f"# No PRs Found\n\nNo merged PRs found for user **{github_username}** in repository **{repo}** for year **{year}**."
+            })
         
-        # Then, summarize
-        summarize_result = subprocess.run(
-            ["poetry", "run", "python", "-m", "backend.summarize_prs"],
-            cwd=BASE_DIR,
-            capture_output=True,
-            text=True,
-            timeout=300  # 5 minute timeout
+        logger.info("Found %d PRs, generating summary...", len(prs))
+        
+        # Step 2: Summarize PRs (in memory)
+        summary = summarize_prs_in_memory(
+            prs=prs,
+            year=year,
+            openai_api_key=openai_api_key,
+            role_requirements=role_requirements
         )
         
-        output_parts.append("\n=== Summarize PRs ===")
-        output_parts.append(summarize_result.stdout)
-        if summarize_result.stderr:
-            output_parts.append(summarize_result.stderr)
+        logger.info("Summary generated successfully")
+        return jsonify({"summary": summary})
         
-        if summarize_result.returncode != 0:
-            return jsonify({
-                "error": "Failed to generate summary",
-                "details": summarize_result.stderr,
-                "output": "\n".join(output_parts)
-            }), 500
-        
-        return jsonify({
-            "message": "Summary generated successfully",
-            "output": "\n".join(output_parts)
-        })
-    except subprocess.TimeoutExpired:
-        return jsonify({"error": "Summary generation timed out"}), 500
+    except ValueError as e:
+        logger.error("Validation error: %s", str(e))
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
+        logger.error("Error generating summary: %s", str(e), exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+# Global error handler
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Handle all unhandled exceptions."""
+    logger.error("Unhandled exception: %s", str(e), exc_info=True)
+    return jsonify({"error": str(e)}), 500
 
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5001))
+    logger.info("Starting Flask server on port %d", port)
+    app.run(debug=True, port=port)

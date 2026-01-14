@@ -49,8 +49,6 @@ class SummaryResponse(BaseModel):
 
 
 class Secrets(BaseModel):
-    github_token: str
-    github_username: str
     openai_api_key: str
 
 
@@ -161,7 +159,7 @@ PRs:
 
     # Use OpenAI's structured outputs API with Pydantic model (stable API)
     response = client.chat.completions.create(  # type: ignore[call-overload]
-        model="gpt-5.2",
+        model="gpt-4o",
         max_completion_tokens=2048,
         messages=[{"role": "user", "content": prompt}],
         response_format={
@@ -192,6 +190,49 @@ PRs:
                 raise ValueError(f"Cited URL {url} is not in the provided PRs")
     
     return summary
+
+
+def summarize_prs_in_memory(
+    prs: list[dict],
+    year: int,
+    openai_api_key: str,
+    role_requirements: str
+) -> str:
+    """
+    Summarize PRs in memory without file I/O.
+    
+    Args:
+        prs: List of PR dictionaries with title, description, url, merged_at, labels
+        year: The year for the summary
+        openai_api_key: OpenAI API key
+        role_requirements: Job requirements text
+        
+    Returns:
+        Markdown formatted summary string
+    """
+    client = OpenAI(api_key=openai_api_key)
+    
+    # Convert dicts to PullRequest objects
+    pr_objects = [PullRequest.model_validate(pr) for pr in prs]
+    
+    # Group by label
+    grouped = group_prs_by_label(pr_objects)
+    
+    summaries = {}
+    for label, label_prs in sorted(grouped.items()):
+        summary_response = summarize_label(client, label, label_prs, year, role_requirements)
+        formatted_summary = format_summary_with_citations(summary_response)
+        summaries[label] = formatted_summary
+    
+    # Build final markdown output
+    lines = [f"# Performance Self-Review Summary ({year})", ""]
+    for label, summary in summaries.items():
+        lines.append(f"## {label}")
+        lines.append("")
+        lines.append(summary)
+        lines.append("")
+    
+    return "\n".join(lines)
 
 
 def main():
@@ -236,4 +277,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

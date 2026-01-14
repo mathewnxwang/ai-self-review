@@ -2,23 +2,12 @@
 """Fetch merged PRs from a configured repository for a specified year."""
 
 import json
+import os
 import requests
 from datetime import datetime
 from pathlib import Path
 
 from .config_loader import load_config
-
-
-def load_secrets():
-    """Load GitHub credentials from secrets.json."""
-    # secrets.json is in the project root, one level up from backend/
-    secrets_path = Path(__file__).parent.parent / "secrets.json"
-    if not secrets_path.exists():
-        raise FileNotFoundError(
-            "secrets.json not found. Please create it with your GitHub token and username."
-        )
-    with open(secrets_path, encoding="utf-8") as f:
-        return json.load(f)
 
 
 def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[dict]:
@@ -88,13 +77,16 @@ def main():
     config = load_config()
     repo = config.repo
     year = config.year
+    username = config.github_username
     
-    secrets = load_secrets()
-    token = secrets["github_token"]
-    username = secrets["github_username"]
+    token = os.environ.get("GITHUB_TOKEN")
     
-    if token == "your_github_pat_here" or username == "your_username_here":
-        print("Error: Please update secrets.json with your actual GitHub token and username.")
+    if not token:
+        print("Error: Please set the GITHUB_TOKEN environment variable.")
+        return
+    
+    if not username:
+        print("Error: Please set github_username in config.json.")
         return
     
     prs = fetch_merged_prs(token, username, repo, year)
