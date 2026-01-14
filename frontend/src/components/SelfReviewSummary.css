@@ -1,0 +1,165 @@
+.self-review-summary {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.self-review-summary h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.self-review-summary .header-with-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.self-review-summary .header-with-buttons h2 {
+  margin-bottom: 0;
+}
+
+.self-review-summary .generate-button {
+  background-color: #646cff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.self-review-summary .generate-button:hover:not(:disabled) {
+  background-color: #535bf2;
+}
+
+.self-review-summary .generate-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.self-review-summary .empty-state {
+  color: #999;
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+}
+
+.self-review-summary .message {
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.self-review-summary .message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.self-review-summary .message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.self-review-summary .header-with-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.self-review-summary .header-with-button h2 {
+  margin-bottom: 0;
+}
+
+.self-review-summary .download-button {
+  background-color: #646cff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.self-review-summary .download-button:hover:not(:disabled) {
+  background-color: #535bf2;
+}
+
+.self-review-summary .download-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.self-review-summary.error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.self-review-summary .markdown-content {
+  color: #333;
+  line-height: 1.6;
+}
+
+.self-review-summary .markdown-content h1 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #222;
+  font-size: 2em;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 12px;
+}
+
+.self-review-summary .markdown-content h2 {
+  margin-top: 32px;
+  margin-bottom: 16px;
+  color: #444;
+  font-size: 1.5em;
+}
+
+.self-review-summary .markdown-content h3 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  color: #555;
+  font-size: 1.2em;
+}
+
+.self-review-summary .markdown-content ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.self-review-summary .markdown-content li {
+  margin: 12px 0;
+}
+
+.self-review-summary .markdown-content p {
+  margin: 12px 0;
+}
+
+.self-review-summary .markdown-content strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.self-review-summary .markdown-content a {
+  color: #646cff;
+  text-decoration: none;
+}
+
+.self-review-summary .markdown-content a:hover {
+  text-decoration: underline;
+}
+

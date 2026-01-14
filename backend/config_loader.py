@@ -15,7 +15,8 @@ class Config(BaseModel):
 
 def load_config() -> Config:
     """Load configuration from config.json."""
-    config_path = Path(__file__).parent / "config.json"
+    # config.json is in the project root, one level up from backend/
+    config_path = Path(__file__).parent.parent / "config.json"
     if not config_path.exists():
         raise FileNotFoundError(
             "config.json not found. Please create it with repo and year."

@@ -6,12 +6,13 @@ import requests
 from datetime import datetime
 from pathlib import Path
 
-from config_loader import load_config
+from .config_loader import load_config
 
 
 def load_secrets():
     """Load GitHub credentials from secrets.json."""
-    secrets_path = Path(__file__).parent / "secrets.json"
+    # secrets.json is in the project root, one level up from backend/
+    secrets_path = Path(__file__).parent.parent / "secrets.json"
     if not secrets_path.exists():
         raise FileNotFoundError(
             "secrets.json not found. Please create it with your GitHub token and username."
@@ -101,8 +102,8 @@ def main():
     # Sort by merge date
     prs.sort(key=lambda x: x["merged_at"])
     
-    # Write output
-    output_path = Path(__file__).parent / f"merged_prs_{year}.json"
+    # Write output to project root
+    output_path = Path(__file__).parent.parent / f"merged_prs_{year}.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(prs, f, indent=2)
     

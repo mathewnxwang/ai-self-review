@@ -1,10 +1,20 @@
-.PHONY: fetch summarize review
+.PHONY: fetch summarize review install api frontend
+
+install:
+	poetry install
+	cd frontend && npm install
 
 fetch:
-	poetry run python fetch_prs.py
+	poetry run python -m backend.fetch_prs
 
 summarize:
-	poetry run python summarize_prs.py
+	poetry run python -m backend.summarize_prs
 
 review: fetch summarize
+
+api:
+	poetry run python -m backend.api
+
+frontend:
+	cd frontend && npm run dev
 
