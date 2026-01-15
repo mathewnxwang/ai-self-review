@@ -18,6 +18,7 @@ class PullRequest(BaseModel):
     url: str
     merged_at: str
     labels: list[str]
+    source_repo: str = ""
 
     @property
     def merged_date(self) -> str:
@@ -131,15 +132,15 @@ def format_summary_with_citations(summary_response: SummaryResponse) -> str:
     return "\n".join(lines)
 
 
-def group_prs_by_label(prs: list[PullRequest], repo: str) -> dict[str, list[PullRequest]]:
-    """Group PRs by their labels."""
+def group_prs_by_label(prs: list[PullRequest]) -> dict[str, list[PullRequest]]:
+    """Group PRs by their labels. Unlabeled PRs are grouped by source_repo."""
     grouped: dict[str, list[PullRequest]] = defaultdict(list)
     for pr in prs:
         if pr.labels:
             for label in pr.labels:
                 grouped[label].append(pr)
         else:
-            grouped[repo].append(pr)
+            grouped[pr.source_repo or "unlabeled"].append(pr)
     return dict(grouped)
 
 
@@ -226,17 +227,15 @@ def summarize_prs_in_memory(
     year: int,
     openai_api_key: str,
     role_requirements: str,
-    repo: str
 ) -> str:
     """
     Summarize PRs in memory without file I/O.
     
     Args:
-        prs: List of PR dictionaries with title, description, url, merged_at, labels
+        prs: List of PR dictionaries with title, description, url, merged_at, labels, source_repo
         year: The year for the summary
         openai_api_key: OpenAI API key
         role_requirements: Job requirements text
-        repo: Repository name (owner/repo) to use as section title for unlabeled PRs
         
     Returns:
         Markdown formatted summary string
@@ -246,8 +245,8 @@ def summarize_prs_in_memory(
     # Convert dicts to PullRequest objects
     pr_objects = [PullRequest.model_validate(pr) for pr in prs]
     
-    # Group by label
-    grouped = group_prs_by_label(pr_objects, repo)
+    # Group by label (unlabeled PRs grouped by source_repo)
+    grouped = group_prs_by_label(pr_objects)
     
     summaries = {}
     for label, label_prs in sorted(grouped.items()):
@@ -269,14 +268,13 @@ def summarize_prs_in_memory(
 def main():
     config = load_config()
     year = config.year
-    repo = config.repo
     
     secrets = load_secrets()
     client = OpenAI(api_key=secrets.openai_api_key)
     job_requirements = load_job_requirements()
 
     prs = load_prs(year)
-    grouped = group_prs_by_label(prs, repo)
+    grouped = group_prs_by_label(prs)
 
     print("=" * 60)
     print("PERFORMANCE SELF-REVIEW SUMMARY")

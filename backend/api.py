@@ -3,10 +3,10 @@
 
 import logging
 import os
-from functools import wraps
 
-from flask import Flask, Response, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
 from .fetch_prs import fetch_merged_prs
 from .summarize_prs import load_secrets, summarize_prs_in_memory
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__, static_folder='../frontend/dist', static_url_path='')
 CORS(app)
 
-# HTTP Basic Auth
+
 def check_auth(username: str, password: str) -> bool:
     """Check if username/password combination is valid."""
     expected_user = os.environ.get("APP_USERNAME", "admin")
@@ -30,38 +30,17 @@ def check_auth(username: str, password: str) -> bool:
     return username == expected_user and password == expected_pass
 
 
-def requires_auth(f):
-    """Decorator that requires HTTP Basic Auth."""
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
-            return Response(
-                'Unauthorized. Please provide valid credentials.',
-                401,
-                {'WWW-Authenticate': 'Basic realm="Login Required"'}
-            )
-        return f(*args, **kwargs)
-    return decorated
-
-
-# Apply auth to all API routes
 @app.before_request
-def require_login():
-    """Require authentication for all routes except static files."""
-    # Skip auth for static files and OPTIONS requests (CORS preflight)
+def require_api_auth():
+    """Require authentication for API routes only."""
     if request.method == 'OPTIONS':
         return None
-    if request.path == '/' or request.path.startswith('/assets'):
+    if not request.path.startswith('/api'):
         return None
     
     auth = request.authorization
     if not auth or not check_auth(auth.username, auth.password):
-        return Response(
-            'Unauthorized',
-            401,
-            {'WWW-Authenticate': 'Basic realm="Login Required"'}
-        )
+        return jsonify({"error": "Unauthorized"}), 401
 
 
 # Log all requests
@@ -104,8 +83,15 @@ def generate_summary():
         "summary": "# Performance Self-Review Summary...\\n..."
     }
     """
+    logger.info("=== Starting generate_summary endpoint ===")
     try:
+        logger.info("Parsing request JSON...")
         data = request.json
+        if data is None:
+            logger.error("Request body is not valid JSON or empty")
+            return jsonify({"error": "Request body must be valid JSON"}), 400
+        
+        logger.info("Request data keys: %s", list(data.keys()))
         
         # Validate required fields
         required_fields = ["repos", "year", "github_username", "github_token", "role_requirements"]
@@ -124,9 +110,13 @@ def generate_summary():
         github_token = data["github_token"]
         role_requirements = data["role_requirements"]
         
+        logger.info("Validated input: repos=%s, year=%d, github_username=%s", repos, year, github_username)
+        
         # Load OpenAI API key from secrets.json
+        logger.info("Loading secrets...")
         secrets = load_secrets()
         openai_api_key = secrets.openai_api_key
+        logger.info("Secrets loaded successfully")
         
         logger.info("Generating summary for %d repos/%d", len(repos), year)
         
@@ -137,21 +127,23 @@ def generate_summary():
         
         for repo in repos:
             logger.info("Fetching PRs from %s...", repo)
-            repo_prs = fetch_merged_prs(
-                token=github_token,
-                username=github_username,
-                repo=repo,
-                year=year
-            )
-            if repo_prs:
-                # Add repo information to each PR for tracking
-                for pr in repo_prs:
-                    pr["source_repo"] = repo
-                all_prs.extend(repo_prs)
-                repos_with_prs.append(repo)
-                logger.info("Found %d PRs from %s", len(repo_prs), repo)
-            else:
-                logger.info("No PRs found in %s", repo)
+            try:
+                repo_prs = fetch_merged_prs(
+                    token=github_token,
+                    username=github_username,
+                    repo=repo,
+                    year=year
+                )
+                if repo_prs:
+                    # Convert Pydantic models to dicts for summarize_prs_in_memory
+                    all_prs.extend([pr.model_dump() for pr in repo_prs])
+                    repos_with_prs.append(repo)
+                    logger.info("Found %d PRs from %s", len(repo_prs), repo)
+                else:
+                    logger.info("No PRs found in %s", repo)
+            except Exception as e:
+                logger.error("Error fetching PRs from %s: %s", repo, str(e), exc_info=True)
+                return jsonify({"error": f"Error fetching PRs from {repo}: {str(e)}"}), 500
         
         if not all_prs:
             logger.warning("No PRs found for %s in any repository for %d", github_username, year)
@@ -163,32 +155,63 @@ def generate_summary():
         logger.info("Found %d total PRs across %d repos, generating summary...", len(all_prs), len(repos_with_prs))
         
         # Step 2: Summarize PRs (in memory)
-        # Use the first repo as the default label for unlabeled PRs
-        summary = summarize_prs_in_memory(
-            prs=all_prs,
-            year=year,
-            openai_api_key=openai_api_key,
-            role_requirements=role_requirements,
-            repo=repos[0] if repos else "unknown"
-        )
+        logger.info("Starting PR summarization with OpenAI...")
+        try:
+            summary = summarize_prs_in_memory(
+                prs=all_prs,
+                year=year,
+                openai_api_key=openai_api_key,
+                role_requirements=role_requirements,
+            )
+            logger.info("Summarization complete, summary length: %d chars", len(summary))
+        except Exception as e:
+            logger.error("Error during summarization: %s", str(e), exc_info=True)
+            return jsonify({"error": f"Error generating summary: {str(e)}"}), 500
         
-        logger.info("Summary generated successfully")
+        logger.info("=== Summary generated successfully ===")
         return jsonify({"summary": summary})
         
     except ValueError as e:
-        logger.error("Validation error: %s", str(e))
+        logger.error("Validation error: %s", str(e), exc_info=True)
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        logger.error("Error generating summary: %s", str(e), exc_info=True)
+        logger.error("Unexpected error in generate_summary: %s", str(e), exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 
-# Global error handler
+# HTTP error handler (for 4xx/5xx errors)
+@app.errorhandler(HTTPException)
+def handle_http_exception(e):
+    """Handle HTTP exceptions and return JSON."""
+    logger.error("HTTP exception: %s - %s", e.code, e.description)
+    response = make_response(jsonify({"error": e.description}), e.code)
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+
+# Global error handler for all other exceptions
 @app.errorhandler(Exception)
 def handle_exception(e):
     """Handle all unhandled exceptions."""
+    # Pass through HTTP exceptions to the HTTP handler
+    if isinstance(e, HTTPException):
+        return handle_http_exception(e)
+    
     logger.error("Unhandled exception: %s", str(e), exc_info=True)
-    return jsonify({"error": str(e)}), 500
+    response = make_response(jsonify({"error": str(e)}), 500)
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+
+# Specific 500 error handler
+@app.errorhandler(500)
+def handle_500_error(e):
+    """Handle 500 Internal Server Error."""
+    logger.error("500 error: %s", str(e), exc_info=True)
+    error_msg = str(e) if str(e) else "Internal Server Error"
+    response = make_response(jsonify({"error": error_msg}), 500)
+    response.headers['Content-Type'] = 'application/json'
+    return response
 
 
 if __name__ == "__main__":

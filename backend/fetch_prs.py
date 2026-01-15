@@ -6,11 +6,22 @@ import os
 import requests
 from datetime import datetime
 from pathlib import Path
+from pydantic import BaseModel
 
 from .config_loader import load_config
 
 
-def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[dict]:
+class MergedPR(BaseModel):
+    """Pydantic model for merged PR data."""
+    title: str
+    description: str
+    url: str
+    merged_at: str
+    labels: list[str]
+    source_repo: str
+
+
+def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[MergedPR]:
     """Fetch all PRs created by the user and merged in the specified year."""
     url = f"https://api.github.com/repos/{repo}/pulls"
     headers = {
@@ -42,6 +53,7 @@ def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[di
         if not prs:
             break
         
+        page_example_printed = False
         for pr in prs:
             # Skip if not merged
             if not pr.get("merged_at"):
@@ -59,15 +71,29 @@ def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[di
             if not (start_date <= merged_at_naive <= end_date):
                 continue
             
-            all_prs.append({
-                "title": pr["title"],
-                "description": pr.get("body") or "",
-                "url": pr["html_url"],
-                "merged_at": pr["merged_at"],
-                "labels": [label["name"] for label in pr.get("labels", [])],
-            })
+            pr_data = MergedPR(
+                title=pr["title"],
+                description=pr.get("body") or "",
+                url=pr["html_url"],
+                merged_at=pr["merged_at"],
+                labels=[label["name"] for label in pr.get("labels", [])],
+                source_repo=repo,
+            )
+            all_prs.append(pr_data)
+            
+            # Print first matching PR on each page as example
+            if not page_example_printed:
+                page_example_printed = True
+                print(f"\n  Example PR from page {page}:")
+                print(f"    Title: {pr_data.title}")
+                print(f"    URL: {pr_data.url}")
+                print(f"    Merged: {pr_data.merged_at}")
+                print(f"    Labels: {pr_data.labels}")
+                desc = pr_data.description
+                print(f"    Description: {desc[:100]}..." if len(desc) > 100 else f"    Description: {desc}")
         
         print(f"  Processed page {page} ({len(prs)} PRs)")
+        
         page += 1
     
     return all_prs
@@ -92,12 +118,12 @@ def main():
     prs = fetch_merged_prs(token, username, repo, year)
     
     # Sort by merge date
-    prs.sort(key=lambda x: x["merged_at"])
+    prs.sort(key=lambda x: x.merged_at)
     
-    # Write output to project root
+    # Write output to project root (convert Pydantic models to dicts for JSON serialization)
     output_path = Path(__file__).parent.parent / f"merged_prs_{year}.json"
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(prs, f, indent=2)
+        json.dump([pr.model_dump() for pr in prs], f, indent=2)
     
     print(f"\nFound {len(prs)} merged PRs in {year}")
     print(f"Output written to {output_path}")

@@ -1,4 +1,4 @@
-.PHONY: fetch summarize review install api api2 frontend
+.PHONY: fetch summarize review install api api2 frontend frontend2
 
 install:
 	poetry install
@@ -20,4 +20,7 @@ api2:
 
 frontend:
 	cd frontend && npm run dev
+
+frontend2:
+	cd frontend && API_PORT=5002 npm run dev
 

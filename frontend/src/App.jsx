@@ -22,6 +22,10 @@ const DEFAULT_ROLE_REQUIREMENTS = `# Job Requirements
 `;
 
 function App() {
+  // Auth state - simple gate
+  const [auth, setAuth] = useState(null);
+  const [authError, setAuthError] = useState('');
+
   // Form state - load from localStorage for convenience
   const [formData, setFormData] = useState(() => {
     const saved = localStorage.getItem('selfReviewFormData');
@@ -113,6 +117,7 @@ function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + btoa(auth.username + ':' + auth.password),
         },
         body: JSON.stringify({
           repos: formData.repos,
@@ -123,7 +128,24 @@ function App() {
         }),
       });
 
-      const data = await response.json();
+      // Get response text first to debug empty/invalid responses
+      const responseText = await response.text();
+      console.log('Response status:', response.status);
+      console.log('Response text:', responseText);
+      
+      if (!responseText) {
+        setError(`Server returned empty response (status: ${response.status})`);
+        return;
+      }
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseErr) {
+        console.error('JSON parse error:', parseErr);
+        setError(`Invalid JSON response: ${responseText.substring(0, 200)}`);
+        return;
+      }
 
       if (response.ok) {
         setSummary(data.summary);
@@ -131,6 +153,7 @@ function App() {
         setError(data.error || 'Failed to generate summary');
       }
     } catch (err) {
+      console.error('Request error:', err);
       if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
         setError('Cannot connect to backend. Make sure the server is running.');
       } else {
@@ -144,6 +167,65 @@ function App() {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(summary);
   };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const username = form.username.value;
+    const password = form.password.value;
+    
+    setAuthError('');
+    
+    // Test credentials against the API
+    try {
+      const response = await fetch('/api/generate-summary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + btoa(username + ':' + password),
+        },
+        body: JSON.stringify({ repos: [], year: 2025, github_username: '', github_token: '', role_requirements: '' }),
+      });
+      
+      if (response.status === 401) {
+        setAuthError('Invalid username or password');
+        return;
+      }
+      
+      // Credentials work (even if request fails for other reasons)
+      setAuth({ username, password });
+    } catch (err) {
+      setAuthError('Cannot connect to server');
+    }
+  };
+
+  // Login gate
+  if (!auth) {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <h1>AI Self-Review Generator</h1>
+          <p>Please log in to continue</p>
+        </header>
+        <main className="app-main">
+          <form onSubmit={handleLogin} className="review-form" style={{ maxWidth: '400px', margin: '0 auto' }}>
+            <div className="form-section">
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input id="username" type="text" required autoFocus />
+              </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input id="password" type="password" required />
+              </div>
+            </div>
+            <button type="submit" className="generate-button">Log In</button>
+            {authError && <div className="error-message">{authError}</div>}
+          </form>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
