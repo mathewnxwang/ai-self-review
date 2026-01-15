@@ -30,4 +30,4 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 EXPOSE 5001
 
 # Run with gunicorn
-CMD gunicorn -w 2 -b 0.0.0.0:$PORT backend.api:app
+CMD gunicorn -w 1 --timeout 300 -b 0.0.0.0:$PORT backend.api:app
