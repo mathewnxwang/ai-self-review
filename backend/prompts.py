@@ -1,26 +1,24 @@
 """Prompts for LLM summarization tasks."""
 
 
-def get_summarize_label_prompt(
+def get_summarize_prompt(
     num_prs: int,
     year: int,
-    label: str,
     job_requirements: str,
     prs_text: str,
 ) -> str:
-    """Generate the prompt for summarizing PRs by label.
+    """Generate the prompt for summarizing PRs.
     
     Args:
         num_prs: Number of PRs being summarized
         year: The year for the summary
-        label: The label/project name
         job_requirements: The job requirements text
         prs_text: Formatted PRs text
         
     Returns:
         The formatted prompt string
     """
-    return f"""You are helping an engineer write their performance self-review. Below are {num_prs} pull requests they merged in {year} under the "{label}" project/label.
+    return f"""You are helping an engineer write their performance self-review. Below are {num_prs} pull requests they merged in {year}.
 
 JOB REQUIREMENTS:
 {job_requirements}

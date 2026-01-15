@@ -6,7 +6,6 @@ import logging
 import os
 import time
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -15,7 +14,7 @@ from openai import OpenAI
 from pydantic import BaseModel, ConfigDict, Field
 
 from .models import PullRequest
-from .prompts import get_summarize_label_prompt
+from .prompts import get_summarize_prompt
 
 
 class PRCitation(BaseModel):
@@ -39,8 +38,8 @@ class SummaryBullet(BaseModel):
     )
     
     title: str = Field(description="A 3-5 word bolded title summarizing the bullet point (e.g., 'Built Feature X', 'Refactored Component Y', 'Added Test Coverage')")
-    work_done: str = Field(description="Description of what was done")
-    significance: str = Field(description="Description of how the work_done aligns with the job requirements and could be represented in a performance review")
+    work_done: str = Field(description="Description of what was done.")
+    significance: str = Field(description="Description of how the work_done aligns with the job requirements and could be represented in a performance review. Should be no more than 20 words.")
     career_area: str = Field(description="The job requirements area this bullet point belongs to, as defined in the role requirements document")
     pr_citations: list[PRCitation] = Field(description="List of PR citations (title and URL) that support this bullet point")
 
@@ -150,22 +149,20 @@ def format_prs_for_prompt(prs: list[PullRequest]) -> str:
     return "\n".join(lines)
 
 
-def summarize_label(
+def generate_summary(
     client: OpenAI,
-    label: str,
     prs: list[PullRequest],
     year: int,
     job_requirements: str,
     max_retries: int = 3,
 ) -> SummaryResponse:
-    """Summarize all PRs for a given label into high-level bullet points with citations, grouped by job requirements areas."""
+    """Summarize all PRs into high-level bullet points with citations, grouped by job requirements areas."""
     prs_text = format_prs_for_prompt(prs)
     pr_urls = [pr.url for pr in prs]
 
-    prompt = get_summarize_label_prompt(
+    prompt = get_summarize_prompt(
         num_prs=len(prs),
         year=year,
-        label=label,
         job_requirements=job_requirements,
         prs_text=prs_text,
     )
@@ -176,7 +173,7 @@ def summarize_label(
             # Use OpenAI's structured outputs API with Pydantic model (stable API)
             response = client.chat.completions.create(  # type: ignore[call-overload]
                 model="gpt-5.2",
-                max_completion_tokens=2048,
+                max_completion_tokens=16384,
                 messages=[{"role": "user", "content": prompt}],
                 response_format={
                     "type": "json_schema",
@@ -193,7 +190,7 @@ def summarize_label(
             
             if not content:
                 logger.warning(
-                    f"Empty response for {label} (attempt {attempt + 1}/{max_retries}), "
+                    f"Empty response (attempt {attempt + 1}/{max_retries}), "
                     f"finish_reason={finish_reason}"
                 )
                 raise ValueError(f"Empty response from LLM (finish_reason={finish_reason})")
@@ -214,31 +211,10 @@ def summarize_label(
             last_error = e
             if attempt < max_retries - 1:
                 wait_time = 2 ** attempt  # exponential backoff: 1s, 2s, 4s
-                logger.warning(f"Retry {attempt + 1}/{max_retries} for {label} after error: {e}. Waiting {wait_time}s...")
+                logger.warning(f"Retry {attempt + 1}/{max_retries} after error: {e}. Waiting {wait_time}s...")
                 time.sleep(wait_time)
     
-    raise ValueError(f"Failed to summarize {label} after {max_retries} attempts: {last_error}")
-
-
-def group_prs_by_repo(prs: list[PullRequest]) -> dict[str, list[PullRequest]]:
-    """Group PRs by their source repository."""
-    grouped: dict[str, list[PullRequest]] = defaultdict(list)
-    for pr in prs:
-        repo = pr.source_repo or "unknown"
-        grouped[repo].append(pr)
-    return dict(grouped)
-
-
-def group_prs_by_label_only(prs: list[PullRequest]) -> dict[str, list[PullRequest]]:
-    """Group PRs by their labels only. Unlabeled PRs go to 'unlabeled'."""
-    grouped: dict[str, list[PullRequest]] = defaultdict(list)
-    for pr in prs:
-        if pr.labels:
-            for label in pr.labels:
-                grouped[label].append(pr)
-        else:
-            grouped["unlabeled"].append(pr)
-    return dict(grouped)
+    raise ValueError(f"Failed to generate summary after {max_retries} attempts: {last_error}")
 
 
 def summarize_prs_in_memory(
@@ -250,7 +226,7 @@ def summarize_prs_in_memory(
     """
     Summarize PRs in memory without file I/O.
     
-    PRs are batched first by source_repo, then by label within each repo.
+    All PRs are summarized in a single LLM call.
     
     Args:
         prs: List of PR dictionaries with title, description, url, merged_at, labels, source_repo
@@ -266,49 +242,13 @@ def summarize_prs_in_memory(
     # Convert dicts to PullRequest objects
     pr_objects = [PullRequest.model_validate(pr) for pr in prs]
     
-    # First group by repo, then by label within each repo
-    grouped_by_repo = group_prs_by_repo(pr_objects)
+    # Summarize all PRs in a single LLM call
+    logger.info(f"Summarizing {len(pr_objects)} PRs in a single call")
+    summary_response = generate_summary(client, pr_objects, year, role_requirements)
+    formatted_summary = format_summary_with_citations(summary_response)
+    logger.info("Completed summarization")
     
-    # Structure: {repo: {label: [prs]}}
-    batches: dict[str, dict[str, list[PullRequest]]] = {}
-    for repo, repo_prs in grouped_by_repo.items():
-        batches[repo] = group_prs_by_label_only(repo_prs)
-    
-    # Flatten batches into a list of tasks: [(repo, label, prs), ...]
-    tasks: list[tuple[str, str, list[PullRequest]]] = []
-    for repo, labels in batches.items():
-        for label, label_prs in labels.items():
-            tasks.append((repo, label, label_prs))
-    
-    def process_batch(task: tuple[str, str, list[PullRequest]]) -> tuple[str, str, str]:
-        repo, label, label_prs = task
-        batch_key = f"{repo}/{label}"
-        logger.info(f"Processing batch: {batch_key} ({len(label_prs)} PRs)")
-        summary_response = summarize_label(client, batch_key, label_prs, year, role_requirements)
-        formatted_summary = format_summary_with_citations(summary_response)
-        logger.info(f"Completed batch: {batch_key}")
-        return repo, label, formatted_summary
-    
-    # Process batches concurrently
-    summaries: dict[str, dict[str, str]] = defaultdict(dict)
-    with ThreadPoolExecutor(max_workers=min(len(tasks), 10)) as executor:
-        futures = {executor.submit(process_batch, task): task for task in tasks}
-        for future in as_completed(futures):
-            repo, label, formatted_summary = future.result()
-            summaries[repo][label] = formatted_summary
-    
-    # Build final markdown output grouped by repo then label
-    lines = []
-    for repo in sorted(summaries.keys()):
-        lines.append(f"## {repo}")
-        lines.append("")
-        for label, summary in sorted(summaries[repo].items()):
-            lines.append(f"### {label}")
-            lines.append("")
-            lines.append(summary)
-            lines.append("")
-    
-    return "\n".join(lines)
+    return formatted_summary
 
 
 def main():
@@ -338,7 +278,7 @@ def main():
     summaries = {}
     for label, label_prs in sorted(grouped.items()):
         print(f"\nSummarizing {label} ({len(label_prs)} PRs)...")
-        summary_response = summarize_label(client, label, label_prs, year, job_requirements)
+        summary_response = generate_summary(client, label_prs, year, job_requirements)
         
         # Format summary with citations
         formatted_summary = format_summary_with_citations(summary_response)
