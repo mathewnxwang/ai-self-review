@@ -2,27 +2,20 @@
 """Summarize merged PRs by label using LLM for performance self-review."""
 
 import json
+import logging
 import os
+import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 from openai import OpenAI
 from pydantic import BaseModel, ConfigDict, Field
 
-from .config_loader import load_config
-
-
-class PullRequest(BaseModel):
-    title: str
-    description: str
-    url: str
-    merged_at: str
-    labels: list[str]
-    source_repo: str = ""
-
-    @property
-    def merged_date(self) -> str:
-        return self.merged_at[:10]
+from .models import PullRequest
+from .prompts import get_summarize_label_prompt
 
 
 class PRCitation(BaseModel):
@@ -157,69 +150,95 @@ def format_prs_for_prompt(prs: list[PullRequest]) -> str:
     return "\n".join(lines)
 
 
-def summarize_label(client: OpenAI, label: str, prs: list[PullRequest], year: int, job_requirements: str) -> SummaryResponse:
+def summarize_label(
+    client: OpenAI,
+    label: str,
+    prs: list[PullRequest],
+    year: int,
+    job_requirements: str,
+    max_retries: int = 3,
+) -> SummaryResponse:
     """Summarize all PRs for a given label into high-level bullet points with citations, grouped by job requirements areas."""
     prs_text = format_prs_for_prompt(prs)
     pr_urls = [pr.url for pr in prs]
 
-    prompt = f"""You are helping an engineer write their performance self-review. Below are {len(prs)} pull requests they merged in {year} under the "{label}" project/label.
-
-JOB REQUIREMENTS:
-{job_requirements}
-
-Analyze these PRs and summarize the key themes, accomplishments, and impact into 3-7 high-level bullet points. For each bullet point, provide:
-- **title**: A 3-5 word bolded title summarizing the bullet point (e.g., "Built Feature X", "Refactored Component Y", "Added Test Coverage")
-- **work_done**: A factual description of what was done (e.g., "Built feature X", "Refactored component Y", "Added tests for Z")
-- **significance**: How this work aligns with the job requirements above and could be represented in a performance review context. Reference specific aspects of the job requirements that this work demonstrates (e.g., "Demonstrates ownership and impact by delivering end-to-end features that make net positive impact to the business", "Shows commitment to technical craft through high-quality code and reliability improvements", "Highlights teamwork and collaboration by proactively unblocking team members")
-- **career_area**: The job requirements area this bullet point belongs to. Determine the appropriate area based on the job requirements document above. Use the exact section heading name from the document (e.g., if the document has a section called "Ownership & Impact", use that exact name)
-
-Focus on:
-- Major features or capabilities delivered
-- Technical improvements and optimizations
-- Process improvements or tooling
-- Cross-team collaboration or leadership
-- Impact and value delivered
-
-Be specific but concise. Use action verbs. Quantify impact where possible. When describing significance, explicitly connect the work to the job requirements.
-
-For each bullet point, cite the relevant PRs that support that point. Include the PR title and URL for each citation. A bullet point can cite one or more PRs.
-
-PRs:
-{prs_text}"""
-
-    # Use OpenAI's structured outputs API with Pydantic model (stable API)
-    response = client.chat.completions.create(  # type: ignore[call-overload]
-        model="gpt-5.2",
-        max_completion_tokens=2048,
-        messages=[{"role": "user", "content": prompt}],
-        response_format={
-            "type": "json_schema",
-            "json_schema": {
-                "name": "summary_response",
-                "schema": SummaryResponse.model_json_schema(),
-                "strict": True,
-            },
-        },
+    prompt = get_summarize_label_prompt(
+        num_prs=len(prs),
+        year=year,
+        label=label,
+        job_requirements=job_requirements,
+        prs_text=prs_text,
     )
 
-    content = response.choices[0].message.content
-    if not content:
-        raise ValueError("Empty response from LLM")
+    last_error: Exception | None = None
+    for attempt in range(max_retries):
+        try:
+            # Use OpenAI's structured outputs API with Pydantic model (stable API)
+            response = client.chat.completions.create(  # type: ignore[call-overload]
+                model="gpt-5.2",
+                max_completion_tokens=2048,
+                messages=[{"role": "user", "content": prompt}],
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "summary_response",
+                        "schema": SummaryResponse.model_json_schema(),
+                        "strict": True,
+                    },
+                },
+            )
+
+            content = response.choices[0].message.content
+            finish_reason = response.choices[0].finish_reason
+            
+            if not content:
+                logger.warning(
+                    f"Empty response for {label} (attempt {attempt + 1}/{max_retries}), "
+                    f"finish_reason={finish_reason}"
+                )
+                raise ValueError(f"Empty response from LLM (finish_reason={finish_reason})")
+            
+            # Parse JSON response into Pydantic model
+            summary = SummaryResponse.model_validate_json(content)
+            
+            # Validate that all cited URLs are from the provided PRs
+            all_urls = set(pr_urls)
+            for bullet in summary.bullets:
+                for citation in bullet.pr_citations:
+                    if citation.url not in all_urls:
+                        raise ValueError(f"Cited URL {citation.url} is not in the provided PRs")
+            
+            return summary
+            
+        except Exception as e:
+            last_error = e
+            if attempt < max_retries - 1:
+                wait_time = 2 ** attempt  # exponential backoff: 1s, 2s, 4s
+                logger.warning(f"Retry {attempt + 1}/{max_retries} for {label} after error: {e}. Waiting {wait_time}s...")
+                time.sleep(wait_time)
     
-    # Parse JSON response into Pydantic model
-    try:
-        summary = SummaryResponse.model_validate_json(content)
-    except Exception as e:
-        raise ValueError(f"Failed to parse LLM response as JSON: {e}") from e
-    
-    # Validate that all cited URLs are from the provided PRs
-    all_urls = set(pr_urls)
-    for bullet in summary.bullets:
-        for citation in bullet.pr_citations:
-            if citation.url not in all_urls:
-                raise ValueError(f"Cited URL {citation.url} is not in the provided PRs")
-    
-    return summary
+    raise ValueError(f"Failed to summarize {label} after {max_retries} attempts: {last_error}")
+
+
+def group_prs_by_repo(prs: list[PullRequest]) -> dict[str, list[PullRequest]]:
+    """Group PRs by their source repository."""
+    grouped: dict[str, list[PullRequest]] = defaultdict(list)
+    for pr in prs:
+        repo = pr.source_repo or "unknown"
+        grouped[repo].append(pr)
+    return dict(grouped)
+
+
+def group_prs_by_label_only(prs: list[PullRequest]) -> dict[str, list[PullRequest]]:
+    """Group PRs by their labels only. Unlabeled PRs go to 'unlabeled'."""
+    grouped: dict[str, list[PullRequest]] = defaultdict(list)
+    for pr in prs:
+        if pr.labels:
+            for label in pr.labels:
+                grouped[label].append(pr)
+        else:
+            grouped["unlabeled"].append(pr)
+    return dict(grouped)
 
 
 def summarize_prs_in_memory(
@@ -230,6 +249,8 @@ def summarize_prs_in_memory(
 ) -> str:
     """
     Summarize PRs in memory without file I/O.
+    
+    PRs are batched first by source_repo, then by label within each repo.
     
     Args:
         prs: List of PR dictionaries with title, description, url, merged_at, labels, source_repo
@@ -245,34 +266,68 @@ def summarize_prs_in_memory(
     # Convert dicts to PullRequest objects
     pr_objects = [PullRequest.model_validate(pr) for pr in prs]
     
-    # Group by label (unlabeled PRs grouped by source_repo)
-    grouped = group_prs_by_label(pr_objects)
+    # First group by repo, then by label within each repo
+    grouped_by_repo = group_prs_by_repo(pr_objects)
     
-    summaries = {}
-    for label, label_prs in sorted(grouped.items()):
-        summary_response = summarize_label(client, label, label_prs, year, role_requirements)
+    # Structure: {repo: {label: [prs]}}
+    batches: dict[str, dict[str, list[PullRequest]]] = {}
+    for repo, repo_prs in grouped_by_repo.items():
+        batches[repo] = group_prs_by_label_only(repo_prs)
+    
+    # Flatten batches into a list of tasks: [(repo, label, prs), ...]
+    tasks: list[tuple[str, str, list[PullRequest]]] = []
+    for repo, labels in batches.items():
+        for label, label_prs in labels.items():
+            tasks.append((repo, label, label_prs))
+    
+    def process_batch(task: tuple[str, str, list[PullRequest]]) -> tuple[str, str, str]:
+        repo, label, label_prs = task
+        batch_key = f"{repo}/{label}"
+        logger.info(f"Processing batch: {batch_key} ({len(label_prs)} PRs)")
+        summary_response = summarize_label(client, batch_key, label_prs, year, role_requirements)
         formatted_summary = format_summary_with_citations(summary_response)
-        summaries[label] = formatted_summary
+        logger.info(f"Completed batch: {batch_key}")
+        return repo, label, formatted_summary
     
-    # Build final markdown output
-    lines = [f"# Performance Self-Review Summary ({year})", ""]
-    for label, summary in summaries.items():
-        lines.append(f"## {label}")
+    # Process batches concurrently
+    summaries: dict[str, dict[str, str]] = defaultdict(dict)
+    with ThreadPoolExecutor(max_workers=min(len(tasks), 10)) as executor:
+        futures = {executor.submit(process_batch, task): task for task in tasks}
+        for future in as_completed(futures):
+            repo, label, formatted_summary = future.result()
+            summaries[repo][label] = formatted_summary
+    
+    # Build final markdown output grouped by repo then label
+    lines = []
+    for repo in sorted(summaries.keys()):
+        lines.append(f"## {repo}")
         lines.append("")
-        lines.append(summary)
-        lines.append("")
+        for label, summary in sorted(summaries[repo].items()):
+            lines.append(f"### {label}")
+            lines.append("")
+            lines.append(summary)
+            lines.append("")
     
     return "\n".join(lines)
 
 
 def main():
-    config = load_config()
-    year = config.year
+    """Interactive CLI for summarizing PRs during development."""
+    print("=== Summarize PRs (Dev Mode) ===\n")
+    
+    # Prompt for year
+    year_str = input("Year (e.g., 2025): ").strip()
+    try:
+        year = int(year_str)
+    except ValueError:
+        print("Error: Year must be a number.")
+        return
     
     secrets = load_secrets()
     client = OpenAI(api_key=secrets.openai_api_key)
     job_requirements = load_job_requirements()
 
+    print(f"\nLoading PRs from merged_prs_{year}.json...")
     prs = load_prs(year)
     grouped = group_prs_by_label(prs)
 

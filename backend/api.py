@@ -25,8 +25,8 @@ CORS(app)
 
 def check_auth(username: str, password: str) -> bool:
     """Check if username/password combination is valid."""
-    expected_user = os.environ.get("APP_USERNAME", "admin")
-    expected_pass = os.environ.get("APP_PASSWORD", "changeme")
+    expected_user = os.environ.get("APP_USERNAME", "user")
+    expected_pass = os.environ.get("APP_PASSWORD", "Newfront!1")
     return username == expected_user and password == expected_pass
 
 

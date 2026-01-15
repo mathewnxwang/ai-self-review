@@ -329,7 +329,7 @@ function App() {
           <div className="form-section">
             <h2>Role Requirements</h2>
             <p className="section-description">
-              Define the criteria your work will be evaluated against. The AI will align your PR summaries with these requirements.
+              Define the criteria your work will be evaluated against. The AI will align its summary of your work with these requirements.
             </p>
             <div className="form-group">
               <textarea

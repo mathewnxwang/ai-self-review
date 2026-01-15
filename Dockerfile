@@ -19,5 +19,5 @@ COPY frontend/dist/ ./frontend/dist/
 EXPOSE 5001
 
 # Run with gunicorn
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5001", "backend.api:app"]
+CMD gunicorn -w 2 -b 0.0.0.0:$PORT backend.api:app
 

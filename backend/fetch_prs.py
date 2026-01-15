@@ -6,22 +6,11 @@ import os
 import requests
 from datetime import datetime
 from pathlib import Path
-from pydantic import BaseModel
 
-from .config_loader import load_config
-
-
-class MergedPR(BaseModel):
-    """Pydantic model for merged PR data."""
-    title: str
-    description: str
-    url: str
-    merged_at: str
-    labels: list[str]
-    source_repo: str
+from .models import PullRequest
 
 
-def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[MergedPR]:
+def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[PullRequest]:
     """Fetch all PRs created by the user and merged in the specified year."""
     url = f"https://api.github.com/repos/{repo}/pulls"
     headers = {
@@ -71,7 +60,7 @@ def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[Me
             if not (start_date <= merged_at_naive <= end_date):
                 continue
             
-            pr_data = MergedPR(
+            pr_data = PullRequest(
                 title=pr["title"],
                 description=pr.get("body") or "",
                 url=pr["html_url"],
@@ -100,21 +89,36 @@ def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[Me
 
 
 def main():
-    config = load_config()
-    repo = config.repo
-    year = config.year
-    username = config.github_username
+    """Interactive CLI for fetching PRs during development."""
+    print("=== Fetch Merged PRs (Dev Mode) ===\n")
     
-    token = os.environ.get("GITHUB_TOKEN")
+    # Prompt for inputs
+    repo = input("Repository (e.g., owner/repo): ").strip()
+    if not repo:
+        print("Error: Repository is required.")
+        return
+    
+    year_str = input("Year (e.g., 2025): ").strip()
+    try:
+        year = int(year_str)
+    except ValueError:
+        print("Error: Year must be a number.")
+        return
+    
+    username = input("GitHub username: ").strip()
+    if not username:
+        print("Error: GitHub username is required.")
+        return
+    
+    token = input("GitHub token (or press Enter to use GITHUB_TOKEN env var): ").strip()
+    if not token:
+        token = os.environ.get("GITHUB_TOKEN", "")
     
     if not token:
-        print("Error: Please set the GITHUB_TOKEN environment variable.")
+        print("Error: GitHub token is required (either input or GITHUB_TOKEN env var).")
         return
     
-    if not username:
-        print("Error: Please set github_username in config.json.")
-        return
-    
+    print()
     prs = fetch_merged_prs(token, username, repo, year)
     
     # Sort by merge date
