@@ -26,6 +26,10 @@ def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[Pu
     start_date = datetime(year, 1, 1)
     end_date = datetime(year, 12, 31, 23, 59, 59)
     
+    # Early exit: stop after finding user's PRs all before target year
+    consecutive_old_pages = 0
+    max_consecutive_old_pages = 1
+    
     print(f"Fetching merged PRs for {username} from {repo}...")
     
     while True:
@@ -43,22 +47,34 @@ def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[Pu
             break
         
         page_example_printed = False
+        found_match_this_page = False
+        found_old_user_pr = False  # Track if user has PRs merged before target year
+        
         for pr in prs:
             # Skip if not merged
             if not pr.get("merged_at"):
                 continue
             
-            # Check if created by the target user
+            # Skip early if not created by the target user
             author = pr.get("user", {})
             if not author or author.get("login", "").lower() != username.lower():
                 continue
             
-            # Parse merge date and filter by year
+            # Parse merge date
             merged_at = datetime.fromisoformat(pr["merged_at"].replace("Z", "+00:00"))
             merged_at_naive = merged_at.replace(tzinfo=None)
             
-            if not (start_date <= merged_at_naive <= end_date):
+            # Check if PR is before target year (too old)
+            if merged_at_naive < start_date:
+                found_old_user_pr = True
                 continue
+            
+            # Check if PR is after target year (too new)
+            if merged_at_naive > end_date:
+                continue
+            
+            # Found a matching PR in the target year
+            found_match_this_page = True
             
             pr_data = PullRequest(
                 title=pr["title"],
@@ -82,6 +98,16 @@ def fetch_merged_prs(token: str, username: str, repo: str, year: int) -> list[Pu
                 print(f"    Description: {desc[:100]}..." if len(desc) > 100 else f"    Description: {desc}")
         
         print(f"  Processed page {page} ({len(prs)} PRs)")
+        
+        # Early exit: if no matches found and user has PRs from before target year
+        if not found_match_this_page and found_old_user_pr:
+            consecutive_old_pages += 1
+            print(f"  No matches, found old PRs from {username} ({consecutive_old_pages}/{max_consecutive_old_pages})")
+            if consecutive_old_pages >= max_consecutive_old_pages:
+                print(f"  Stopping early - past target year range for {username}")
+                break
+        elif found_match_this_page:
+            consecutive_old_pages = 0  # Reset counter when we find matches
         
         page += 1
     
